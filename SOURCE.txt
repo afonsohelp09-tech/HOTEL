@@ -1,0 +1,10 @@
+FICHIER SOURCE ORIGINAL
+=======================
+
+Nom : originaux/transfer-parceiro/Transfer parceiro .html
+
+Variante bureau complete.
+
+Regenerer : .\build.ps1
+
+Ne pas editer index.html ici sauf urgence - modifier le .html source ci-dessus.
