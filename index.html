@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <!--
-  Nhalabene (marque — lignes de produits prévues pour différentes catégories ; ce dépôt : premier projet).
+  Agence Ruelas — Portal Hotel.
   Auteur : Sigagomes Afonso. Contact uniquement via lecture du code source (rien n'est affiché à l'écran pour les utilisateurs) : sigagomesafonso@gmail.com
 -->
 
@@ -47,6 +47,7 @@
   // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
   //  ★★★ COLLER VOTRE URL ICI — C'EST LA SEULE CHOSE À CHANGER ★★★
   const API_URL = 'https://script.google.com/macros/s/AKfycbzZHlmT6MPxC5IQesVZwuE_zDulDiNEmgsRDJkyqZ6TWQoXLs8FkBykjei-M9iMwSTWyg/exec';
+  // ⚠️ Si login → HTTP 404 : ce déploiement est mort. Apps Script → Déployer → Nouvelle version → coller /exec ici (tous les portails).
   //  Exemple : 'https://script.google.com/macros/s/AKfy.../exec'
   //
   //  CONTACT WHATSAPP DE L'AGENCE RUELAS (siège) — pour que l'hôtel puisse
@@ -834,9 +835,9 @@ html[data-theme="dark"] .header .lang-app .lp.active{
   </div>
   <div class="login-box">
     <div class="login-logo">
-      <div class="login-emblem"><img src="logo-login.svg" alt="Nhalabene" width="200" height="64" decoding="async" style="width:min(220px,70vw);height:auto"></div>
+      <div class="login-emblem"><img src="logo-login.png" alt="Agence Ruelas" width="200" height="64" decoding="async" style="width:min(220px,70vw);height:auto"></div>
       <div class="login-brand">Portal Hotel</div>
-      <div class="login-sub">Agence Ruelas · FINAL · Nhalabene</div>
+      <div class="login-sub">Agence Ruelas · FINAL</div>
     </div>
     <div class="login-divider"></div>
 
@@ -853,7 +854,7 @@ html[data-theme="dark"] .header .lang-app .lp.active{
       <button class="btn-primary" id="login-btn" onclick="doLogin()">
         <div class="sp"></div><span class="btn-t" id="lbl-login-btn">Entrar</span>
       </button>
-      <div class="toggle-link" onclick="showReset()">🔑 <span id="lbl-reset-link">Alterar / Recuperar palavra-passe</span></div>
+      <div class="toggle-link" style="cursor:default;opacity:.85;pointer-events:none" id="lbl-reset-link">🔐 Palavra-passe definida pela Agência</div>
     </div>
 
     <!-- Step 2 : Demander code reset -->
@@ -914,7 +915,7 @@ html[data-theme="dark"] .header .lang-app .lp.active{
 <div id="app-screen" class="screen">
   <div class="header">
     <div class="header-left">
-      <div class="header-logo"><img src="logo-topbar.svg" alt="Nhalabene" width="120" height="40" decoding="async" style="width:120px;height:auto"></div>
+      <div class="header-logo"><img src="logo-topbar.png" alt="Agence Ruelas" width="120" height="40" decoding="async" style="width:120px;height:auto"></div>
       <div class="header-title">Portal <em>Hotel</em> · <span id="header-agency-name">Hotel</span></div>
     </div>
     <div class="header-right">
@@ -1422,7 +1423,7 @@ async function api(payload){
     headers:{'Content-Type':'text/plain'},
     body: JSON.stringify(payload)
   });
-  if(!r.ok) throw new Error('HTTP ' + r.status + ' — ' + r.statusText);
+  if(!r.ok){var _hint=r.status===404?' Déploiement /exec introuvable — redéployez Apps Script (ERP TRANSFERS) et collez la nouvelle URL API_URL dans ce HTML.':'';throw new Error('HTTP '+r.status+' — '+r.statusText+_hint);}
   const data = await r.json();
   return data;
 }
