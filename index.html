@@ -84,10 +84,32 @@
   --ease:.22s cubic-bezier(.4,0,.2,1);
 }
 /* Sans ceci, Chrome/Edge (surtout Windows thème sombre) affichent date/select en « style sombre » même sur une page claire */
-html{color-scheme:light}
-html,body{height:100%;overflow-x:hidden}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;-webkit-font-smoothing:antialiased}
-.screen{display:none;min-height:100vh}.screen.on{display:flex}
+html{color-scheme:light;-webkit-text-size-adjust:100%}
+html,body{height:100%;min-height:100dvh;overflow-x:hidden}
+body{
+  background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;
+  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;
+}
+.screen{display:none;min-height:100vh;min-height:100dvh}.screen.on{display:flex}
+/* Bottom nav (mobile) */
+.bottom-nav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:300;background:var(--white);border-top:1px solid var(--border);box-shadow:0 -4px 20px rgba(13,33,55,.08);padding:6px 4px max(10px,env(safe-area-inset-bottom));gap:2px;justify-content:space-around;align-items:stretch}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:48px;padding:6px 4px;border:none;background:transparent;color:var(--ts);font-family:'DM Sans',sans-serif;font-size:.6875rem;font-weight:600;line-height:1.15;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;border-radius:var(--r)}
+.bn-item .bn-ico{font-size:1.25rem;line-height:1}
+.bn-item.active{color:var(--navy);background:rgba(201,168,76,.12)}
+.bn-item.active .bn-ico{transform:translateY(-1px)}
+/* Cards lista (mobile) */
+.m-card-list{display:none;flex-direction:column;gap:12px;padding:4px 0 8px}
+.m-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:1rem;box-shadow:var(--shadow);touch-action:manipulation}
+.m-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.m-card-ref{font-family:ui-monospace,monospace;font-size:.8125rem;font-weight:700;color:var(--navy)}
+.m-card-client{font-size:1rem;font-weight:600;color:var(--text);margin:0 0 6px}
+.m-card-meta{font-size:.8125rem;color:var(--ts);line-height:1.45;margin:0 0 10px}
+.m-card-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.m-card-acts{display:flex;flex-wrap:wrap;gap:8px}
+.m-card-acts .btn{min-width:44px;min-height:44px;touch-action:manipulation}
+.tbl-scroll-hint{display:none;font-size:.75rem;color:var(--ts);padding:6px 4px 2px;font-weight:500}
+/* Bottom sheet handle */
+.modal-sheet-handle{display:none;width:40px;height:4px;border-radius:99px;background:var(--border);margin:10px auto 0;flex-shrink:0}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
@@ -418,7 +440,10 @@ html[data-theme="dark"] .card{background:var(--white);border-color:var(--border)
 html[data-theme="dark"] .card-ttl,
 html[data-theme="dark"] .stat-val{color:#f2f6fc}
 html[data-theme="dark"] .stat-lbl{color:#b8c5d8}
-html[data-theme="dark"] .tabs-bar{background:var(--surface);border-bottom-color:var(--border)}
+html[data-theme="dark"] .bottom-nav{background:var(--surface);border-top-color:var(--border)}
+html[data-theme="dark"] .bn-item.active{color:var(--gold);background:rgba(212,181,92,.14)}
+html[data-theme="dark"] .m-card{background:var(--white);border-color:var(--border)}
+html[data-theme="dark"] .modal-sheet-handle,.overlay > .modal::before{background:var(--border)}
 html[data-theme="dark"] .tab-btn{color:var(--ts)}
 html[data-theme="dark"] .tab-btn:hover{color:var(--text)}
 html[data-theme="dark"] .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
@@ -517,6 +542,7 @@ html[data-theme="dark"] .header .lang-app .lp.active{
 
 /* ══ Téléphone / petit écran — lisibilité + cibles tactiles (min ~44px) ══ */
 @media(max-width:768px){
+  body{font-size:1rem}
   #app-screen,#login-screen{padding-left:max(0px, env(safe-area-inset-left));padding-right:max(0px, env(safe-area-inset-right))}
   /* Espace sous les boutons thème (coin) pour ne pas recouvrir la liste langue */
   #login-screen{padding-top:max(44px, calc(env(safe-area-inset-top) + 28px));padding-bottom:max(12px, env(safe-area-inset-bottom))}
@@ -671,8 +697,13 @@ html[data-theme="dark"] .header .lang-app .lp.active{
     line-height:1!important;
     touch-action:manipulation;
   }
-  .login-box{padding:28px 20px}
-  .btn-primary{min-height:48px;touch-action:manipulation}
+  .login-box{padding:1.5rem 1.25rem;max-width:400px}
+  .login-emblem{width:72px;height:72px;border-radius:16px;margin-bottom:10px}
+  .login-brand{font-size:clamp(1.375rem,5vw,1.5rem)}
+  .login-title{font-size:clamp(1.125rem,3.5vw,1.25rem);font-weight:600}
+  .field{margin-bottom:1rem}
+  .field input{min-height:50px;font-size:1rem;padding:12px 14px}
+  .btn-primary{min-height:52px;width:100%;touch-action:manipulation;font-size:.875rem}
   .toggle-link{padding:10px 4px;min-height:44px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center}
   .header{
     padding:max(6px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 8px max(10px, env(safe-area-inset-left));
@@ -722,42 +753,31 @@ html[data-theme="dark"] .header .lang-app .lp.active{
     letter-spacing:.04em;
   }
   .session-bar{padding:8px max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left));font-size:12px}
-  /* Header sur 2 lignes : compenser la hauteur pour l’ancrage des onglets */
-  .tabs-bar{
-    top:114px;
-    padding:0 max(10px, env(safe-area-inset-right)) 0 max(10px, env(safe-area-inset-left));
-    -webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;
-  }
-  .tab-btn{
-    padding:14px 16px;min-height:48px;flex-shrink:0;scroll-snap-align:start;
-    touch-action:manipulation;
-  }
-  .main{padding:12px;padding-bottom:max(20px, env(safe-area-inset-bottom))}
+  /* Onglets desktop masqués → bottom nav */
+  .tabs-bar{display:none!important}
+  .bottom-nav{display:flex}
+  #app-screen.on{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+  .main{padding:1rem;padding-bottom:max(1.25rem, env(safe-area-inset-bottom))}
   .stats-grid{grid-template-columns:repeat(2,1fr);gap:10px}
-  .stat-card{padding:14px;min-height:72px}
-  .stat-val{font-size:24px}
+  .stat-card{padding:1rem;min-height:72px}
+  .stat-val{font-size:clamp(1.25rem,5vw,1.5rem);font-weight:700}
   .card-hdr{flex-direction:column;align-items:stretch}
   .hdr-acts{width:100%;justify-content:stretch;gap:8px}
   .hdr-acts .btn{flex:1;min-height:44px;justify-content:center;touch-action:manipulation;padding:10px 8px}
   .filters{padding:12px 14px;gap:12px}
   .fg-f{width:100%}
-  .f-inp,.field input,.m-inp,.m-sel,.m-ta{font-size:16px}
+  .f-inp,.field input,.m-inp,.m-sel,.m-ta{font-size:1rem;min-height:48px}
   .filters .btn-navy,.filters .btn-ghost{min-height:44px;padding:10px 14px;touch-action:manipulation}
-  .tbl-wrap{
-    overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
-    margin:0 -4px;padding:0 4px;touch-action:pan-x pan-y;
-  }
-  table{min-width:720px}
-  thead th{padding:12px 10px;font-size:11px}
-  td{padding:12px 10px}
-  .row-acts{flex-wrap:wrap;gap:8px}
-  .row-acts .btn{min-width:44px;min-height:44px;padding:10px 12px;touch-action:manipulation}
+  /* Tableau → cartes empilées */
+  .tbl-wrap > table{display:none}
+  .tbl-wrap .m-card-list{display:flex}
+  .tbl-scroll-hint{display:none}
   .pagination{
     flex-direction:column;align-items:stretch;gap:12px;
     padding:14px max(12px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   }
   .page-info{text-align:center}
-  .page-btns{justify-content:center;flex-wrap:wrap;gap:6px}
+  .page-btns{justify-content:center;flex-wrap:wrap;gap:8px}
   .page-btn{min-width:44px;min-height:44px;padding:10px 14px;touch-action:manipulation}
   .info-grid{grid-template-columns:1fr}
   .tl-card{flex-direction:column}
@@ -766,16 +786,20 @@ html[data-theme="dark"] .header .lang-app .lp.active{
   .timeline{padding:16px 12px;padding-bottom:max(20px, env(safe-area-inset-bottom))}
   .upcoming-header{padding:14px 16px}
   .overlay{
-    padding:max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    padding:0;
     align-items:flex-end;
   }
   .modal{
-    max-height:min(100dvh, 100vh);border-radius:var(--r-xl) var(--r-xl) 0 0;
+    max-height:85dvh;max-height:85vh;border-radius:var(--r-xl) var(--r-xl) 0 0;
     position:fixed;bottom:0;left:0;right:0;max-width:100%;
     padding-bottom:max(12px, env(safe-area-inset-bottom));
+    display:flex;flex-direction:column;
   }
-  .modal-hdr{padding:16px 16px}
-  .modal-body{padding:16px}
+  .modal-sheet-handle{display:block}
+  .overlay > .modal::before{content:'';display:block;width:40px;height:4px;border-radius:99px;background:var(--border);margin:10px auto 0;flex-shrink:0}
+  .overlay > .modal:has(.modal-sheet-handle)::before{display:none!important}
+  .modal-hdr{padding:12px 16px 16px;border-radius:0}
+  .modal-body{padding:1rem;overflow-y:auto;-webkit-overflow-scrolling:touch}
   .modal-footer{
     flex-direction:column;align-items:stretch;gap:10px;
     padding:14px 16px;padding-bottom:max(14px, env(safe-area-inset-bottom));
@@ -787,10 +811,10 @@ html[data-theme="dark"] .header .lang-app .lp.active{
   .btn-cal{width:100%;min-height:48px;justify-content:center;touch-action:manipulation}
   .hotel-wa-btns .btn{width:100%;min-height:48px;justify-content:center}
   .wa-prev-lang-sel{min-width:0;width:100%}
-  .hotel-wa-preview,#hotel-wa-sign-input{font-size:16px}
+  .hotel-wa-preview,#hotel-wa-sign-input{font-size:1rem}
   .toast{
     left:max(12px, env(safe-area-inset-left));right:max(12px, env(safe-area-inset-right));
-    bottom:max(16px, env(safe-area-inset-bottom));max-width:none;
+    bottom:calc(72px + env(safe-area-inset-bottom,0px));max-width:none;
   }
 }
 @media(max-width:480px){
@@ -802,6 +826,12 @@ html[data-theme="dark"] .header .lang-app .lp.active{
   .filters .btn-navy,.filters .btn-ghost{width:100%;align-self:stretch!important}
   .hdr-acts .btn span{display:none}
   .hdr-acts .btn{font-size:18px}
+}
+@media(max-width:380px){
+  .bn-item{font-size:.625rem;padding:4px 2px}
+  .bn-item .bn-ico{font-size:1.125rem}
+  .stat-card{padding:12px}
+  .main{padding:.75rem}
 }
 
 /* Route map compact (Nova reserva) — optionnel à la création */
@@ -839,6 +869,67 @@ html[data-theme="dark"] .header .lang-app .lp.active{
 }
 @media(max-width:430px){
   .route-map-el{height:148px}
+}
+
+/* ═══ PACK MOBILE RESPONSIVE (cahier des charges — après règles existantes) ═══ */
+body{font-size:clamp(13px,1.4vw + 10px,15px)}
+.login-brand{font-size:clamp(18px,4vw + 10px,24px)}
+.header-title,.topbar-title{font-size:clamp(14px,2vw + 8px,18px)}
+@media(max-width:1024px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .form-grid{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  button,.btn,.btn-hdr,.tab-btn,.theme-btn,.bn-item{min-height:44px}
+  .theme-btn{width:44px;min-width:44px}
+  .header,.topbar{min-height:52px}
+  .header .header-logo,.topbar-logo{width:28px;height:28px}
+  .admin-badge,.ag-badge span:last-child{max-width:72px}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .service-grid,.form-grid,.nova-grid{grid-template-columns:1fr}
+  .bottom-nav{padding-bottom:max(10px,env(safe-area-inset-bottom,0px))}
+}
+@media(max-width:600px){
+  .overlay{padding:0!important;align-items:stretch!important}
+  .modal{
+    width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;
+    border-radius:0!important;margin:0!important;
+    display:flex;flex-direction:column;
+    bottom:0;left:0;right:0;position:fixed;
+  }
+  .modal-body,.hist-log{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .modal-footer{
+    display:flex;flex-direction:column;gap:8px;
+    position:sticky;bottom:0;background:var(--white,var(--surface));
+    padding:12px;padding-bottom:max(12px,env(safe-area-inset-bottom,0px));
+  }
+  .modal-footer button,.modal-footer .btn,.modal-footer-right .btn{width:100%}
+  .field,.f-group,.m-field{margin-bottom:14px}
+  .field input,.f-group input,.m-inp,.m-sel,.m-ta,.f-inp{
+    width:100%;padding:12px 14px;font-size:16px;box-sizing:border-box;
+  }
+}
+@media(max-width:480px){
+  .login-box{max-width:100%;width:100%;padding:28px 20px;border-radius:16px;margin:0 12px;box-sizing:border-box}
+  .login-emblem{width:64px;height:64px}
+  .login-brand{font-size:18px}
+  .header-title,.topbar-title{font-size:14px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .stats-grid{grid-template-columns:1fr}
+  input,select,textarea,.f-inp,.m-inp,.m-sel,.m-ta{font-size:16px!important}
+  /* Point 7b — si tabs-bar visible : scroll horizontal */
+  .tabs-bar{
+    overflow-x:auto;flex-wrap:nowrap;
+    -webkit-overflow-scrolling:touch;
+    scroll-snap-type:x proximity;
+    padding-bottom:max(4px,env(safe-area-inset-bottom,0px));
+  }
+  .tab-btn{flex:0 0 auto;scroll-snap-align:start;white-space:nowrap;padding:10px 14px}
+  .tabs-bar::-webkit-scrollbar{height:3px}
+}
+@media(max-width:375px){
+  .login-box{padding:22px 14px;margin:0 8px}
+  .bn-item{font-size:.625rem;padding:4px 2px}
+  .header-title{max-width:100px}
 }
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
@@ -1237,11 +1328,19 @@ html[data-theme="dark"] .header .lang-app .lp.active{
       </div>
     </div>
   </div>
+
+  <nav class="bottom-nav" id="hotel-bottom-nav" aria-label="Navegação principal">
+    <button type="button" class="bn-item active" data-tab="all" onclick="switchTab('all')"><span class="bn-ico">📋</span><span id="bn-lbl-all">Reservas</span></button>
+    <button type="button" class="bn-item" data-tab="upcoming" onclick="switchTab('upcoming')"><span class="bn-ico">🗓</span><span id="bn-lbl-upcoming">Próximas</span></button>
+    <button type="button" class="bn-item" data-tab="nova" onclick="switchTab('nova')"><span class="bn-ico">➕</span><span id="bn-lbl-nova">Nova</span></button>
+    <button type="button" class="bn-item" data-tab="historico" onclick="switchTab('historico')"><span class="bn-ico">📁</span><span id="bn-lbl-hist">Histórico</span></button>
+  </nav>
 </div>
 
 <!-- ══ MODAL HISTÓRICO DE UMA RESERVA ══ -->
 <div class="overlay" id="ov-historico" style="z-index:950" onclick="if(event.target===this)closeHistoricoModal()">
   <div class="modal" style="max-width:520px">
+    <div class="modal-sheet-handle" aria-hidden="true"></div>
     <div class="modal-hdr">
       <div>
         <div class="modal-ttl" id="lbl-hist-modal-ttl">Histórico da Reserva</div>
@@ -1261,6 +1360,7 @@ html[data-theme="dark"] .header .lang-app .lp.active{
 <!-- ══ MODAL DÉTAIL ══ -->
 <div class="overlay" id="ov-modal" onclick="closeOv('ov-modal',event)">
   <div class="modal">
+    <div class="modal-sheet-handle" aria-hidden="true"></div>
     <div class="modal-hdr">
       <div>
         <div class="modal-ttl" id="lbl-modal-ttl">Detalhes da Reserva</div>
@@ -1735,6 +1835,8 @@ function setLang(lang, zone){
   s('lbl-wa-prev-lang',T.waPrevLang);
   s('lbl-tab-all',T.tabAll); s('lbl-tab-upcoming',T.tabUpcoming);
   s('lbl-tab-nova',T.tabNova); s('lbl-tab-historico',T.tabHistorico);
+  s('bn-lbl-all',T.bnAll||'Reservas'); s('bn-lbl-upcoming',T.bnUpcoming||'Próximas');
+  s('bn-lbl-nova',T.bnNova||'Nova'); s('bn-lbl-hist',T.bnHist||'Histórico');
   s('lbl-upcoming-title',T.upcomingTitle); s('lbl-upcoming-sub',T.upcomingSub);
   s('lbl-btn-hist',T.btnHist);
   // Nova
@@ -1780,8 +1882,11 @@ function switchTab(tab){
   APP.curTab = tab;
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-btn-' + tab).classList.add('active');
-  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('#hotel-bottom-nav .bn-item').forEach(b => b.classList.toggle('active', b.getAttribute('data-tab')===tab));
+  const tb=document.getElementById('tab-btn-' + tab);
+  const tp=document.getElementById('tab-' + tab);
+  if(tb) tb.classList.add('active');
+  if(tp) tp.classList.add('active');
   if(tab === 'upcoming') renderUpcoming();
   if(tab === 'nova'){
     renderNovaLock();
@@ -2277,6 +2382,8 @@ function renderTable(){
       <th>${T2.colActs}</th>
     </tr></thead><tbody>`;
 
+  let cards = `<div class="m-card-list">`;
+
   for(const r of slice){
     const blocked = r.statut === 'realizado';
     const rDate = parseDate(r.dateTransfer);
@@ -2308,9 +2415,20 @@ function renderTable(){
       <td>${badge(r.statut)}</td>
       <td><div class="row-acts">${acts}</div></td>
     </tr>`;
+    cards += `<article class="m-card" onclick="openDetail('${r.id}')">
+      <div class="m-card-top">
+        <span class="m-card-ref">${r.id}</span>
+        ${badge(r.statut)}
+      </div>
+      <p class="m-card-client">${isNew?'<span class="badge-new">NEW</span> ':''}${isSoon?'<span class="badge-soon">SOON</span> ':''}${r.clientNom||'—'}</p>
+      <p class="m-card-meta">${fmtD(r.dateTransfer)} · ${r.heureTransfer||'—'}<br>${oIco(r.origineType)} ${r.pointDepart||'—'} → ${r.destination||'—'}</p>
+      <div class="m-card-row"><span>${r.personnes||'—'}👤 ${r.malas||'0'}🧳</span><strong>${r.prixFinal?r.prixFinal+'€':'—'}</strong></div>
+      <div class="m-card-acts" onclick="event.stopPropagation()">${acts}</div>
+    </article>`;
   }
   html += `</tbody></table>`;
-  document.getElementById('tbl-wrap').innerHTML = html;
+  cards += `</div>`;
+  document.getElementById('tbl-wrap').innerHTML = html + cards;
   document.getElementById('pagination').style.display = 'flex';
   document.getElementById('page-info').textContent = `${start+1}–${end} ${T2.pageOf} ${total}`;
 
