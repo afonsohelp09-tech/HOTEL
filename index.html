@@ -366,6 +366,10 @@ html[data-theme="dark"] .policy-lock-title{color:#f2f6fc}
 .hotel-wa-ttl{font-size:13px;font-weight:700;color:var(--hotel-wa);display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .hotel-wa-desc{font-size:11px;color:var(--ts);margin-bottom:10px;line-height:1.6}
 .hotel-wa-btns{display:flex;gap:8px;flex-wrap:wrap}
+.hotel-wa-preview{width:100%;min-height:180px;padding:10px 12px;border-radius:8px;border:1px solid var(--hotel-wa-b);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.45;resize:vertical;box-sizing:border-box;background:var(--white);color:var(--text);margin:0}
+#hotel-wa-sign-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}
+#hotel-wa-sign-modal.show{display:flex}
+#hotel-wa-sign-inner{background:var(--white);border-radius:16px;padding:24px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);font-family:'DM Sans',sans-serif;box-sizing:border-box}
 
 /* Toast */
 .toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;border-left:4px solid var(--gold);padding:14px 20px;border-radius:var(--r-lg);font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);z-index:9999;transform:translateX(160%);transition:transform .35s cubic-bezier(.34,1.56,.64,1);max-width:340px;line-height:1.5}
@@ -783,6 +787,7 @@ html[data-theme="dark"] .header .lang-app .lp.active{
   .btn-cal{width:100%;min-height:48px;justify-content:center;touch-action:manipulation}
   .hotel-wa-btns .btn{width:100%;min-height:48px;justify-content:center}
   .wa-prev-lang-sel{min-width:0;width:100%}
+  .hotel-wa-preview,#hotel-wa-sign-input{font-size:16px}
   .toast{
     left:max(12px, env(safe-area-inset-left));right:max(12px, env(safe-area-inset-right));
     bottom:max(16px, env(safe-area-inset-bottom));max-width:none;
@@ -1302,14 +1307,20 @@ html[data-theme="dark"] .header .lang-app .lp.active{
         </div>
         <div class="m-field" style="margin-top:12px">
           <label id="lbl-wa-prev-lang">Idioma da mensagem / pré-visualização</label>
-          <select class="m-sel wa-prev-lang-sel" id="wa-prev-lang" title="Language">
+          <select class="m-sel wa-prev-lang-sel" id="wa-prev-lang" title="Language" onchange="refreshHotelWaPreview()">
             <option value="PT">Português — PT</option>
             <option value="EN">English — EN</option>
             <option value="FR">Français — FR</option>
             <option value="ES">Español — ES</option>
           </select>
         </div>
-        <div class="hotel-wa-btns">
+        <div class="m-field" style="margin-top:10px">
+          <label id="lbl-hotel-wa-preview">Pré-visualização (pode editar antes de enviar)</label>
+          <textarea id="hotel-wa-preview" class="hotel-wa-preview" rows="11" spellcheck="false" aria-label="Mensagem WhatsApp"></textarea>
+          <p id="lbl-hotel-wa-sign-hint" style="font-size:10px;color:var(--ts);margin:8px 0 0;line-height:1.45">Ao enviar ou copiar, será pedido o seu nome para a assinatura (Cumprimentos / Cordialement / Kind regards / Atentamente).</p>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="refreshHotelWaPreview()" style="margin-top:8px">🔄 <span id="lbl-hotel-wa-reset">Restaurar modelo</span></button>
+        </div>
+        <div class="hotel-wa-btns" style="margin-top:12px">
           <button class="btn btn-hotel-wa btn-sm" onclick="openWA()">
             💬 <span id="lbl-hotel-wa-btn">Pedir disponibilidade via WhatsApp</span>
           </button>
@@ -1360,6 +1371,19 @@ html[data-theme="dark"] .header .lang-app .lp.active{
   </div>
 </div>
 
+<div id="hotel-wa-sign-modal" onclick="if(event.target===this)closeHotelWaSignModal()">
+  <div id="hotel-wa-sign-inner" onclick="event.stopPropagation()">
+    <p id="hotel-wa-sign-ttl" style="font-size:15px;font-weight:600;color:var(--navy);margin:0 0 8px">Assinatura obrigatória</p>
+    <p style="font-size:12px;color:var(--ts);margin:0 0 14px;line-height:1.5">Indique só o seu nome. Será colocado por baixo da despedida (Cumprimentos / Cordialement / Kind regards / Atentamente) conforme a língua da mensagem escolhida.</p>
+    <input type="text" id="hotel-wa-sign-input" autocomplete="name" placeholder="Nome / Nom / Name"
+      onkeydown="if(event.key==='Enter'){event.preventDefault();submitHotelWaSign();}"
+      style="width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;margin-bottom:16px;box-sizing:border-box;background:var(--white);color:var(--text)">
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button type="button" onclick="closeHotelWaSignModal()" style="padding:10px 20px;border:1px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text)">Cancelar</button>
+      <button type="button" onclick="submitHotelWaSign()" style="padding:10px 20px;background:var(--navy);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600">Continuar</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1697,6 +1721,11 @@ function setLang(lang, zone){
   s('lbl-btn-pago',T.btnPago||'Transfer pago');
   s('lbl-hotel-wa-ttl',T.hotelWaTtl); s('lbl-hotel-wa-desc',T.hotelWaDesc);
   s('lbl-hotel-wa-btn',T.hotelWaBtn); s('lbl-copy-msg',T.copyMsg);
+  s('lbl-hotel-wa-preview',T.hotelWaPreview||'Pré-visualização (pode editar antes de enviar)');
+  s('lbl-hotel-wa-reset',T.hotelWaReset||'Restaurar modelo');
+  s('lbl-hotel-wa-sign-hint',T.hotelWaSignHint||'Ao enviar ou copiar, será pedido o seu nome para a assinatura (Cumprimentos / Cordialement / Kind regards / Atentamente).');
+  const signTtl=document.getElementById('hotel-wa-sign-ttl');
+  if(signTtl) signTtl.textContent=T.hotelWaSignTtl||'Assinatura obrigatória';
   s('lbl-hotel-edit-sec',T.hotelEditSec||'Editar');
   s('lbl-he-nom',T.heNom); s('lbl-he-tel',T.heTel); s('lbl-he-vol',T.heVol);
   s('lbl-he-depart',T.heDepart); s('lbl-he-dest',T.heDest); s('lbl-he-date',T.heDate);
@@ -2428,9 +2457,10 @@ function renderModal(idx){
   const msgEl = document.getElementById('m-msg');
   if(msgEl) msgEl.className = 'modal-msg';
 
-  // WA HÔTEL — langue du message
+  // WA HÔTEL — langue + pré-visualização editável
   const wpl = document.getElementById('wa-prev-lang');
   if(wpl) wpl.value = APP.lang;
+  refreshHotelWaPreview();
 
   // Calendrier — reservas futures non annulées
   const rDate = parseDate(r.dateTransfer);
@@ -2585,34 +2615,86 @@ function normaliserDigitsPourWaMe(s){
   if(s.charAt(0)==='+')s=s.slice(1);
   return s.replace(/\D/g,'');
 }
+function hotelWaSignFooter(lang, signerName){
+  const closing={PT:'Cumprimentos,',EN:'Kind regards,',FR:'Cordialement,',ES:'Atentamente,'};
+  const k=String(lang||'PT').toUpperCase().slice(0,2);
+  const line=closing[k]||closing.EN;
+  const name=String(signerName||'').trim();
+  return '\n\n'+line+'\n'+name;
+}
+function buildHotelWaBody(){
+  if(!APP.curWaResa) return '';
+  const langCode=getWaPreviewLang();
+  const fn=WA_HOTEL[langCode]||WA_HOTEL.PT;
+  return fn(APP.curWaResa, APP.agencyNom||APP.agencyId);
+}
+function refreshHotelWaPreview(){
+  const ta=document.getElementById('hotel-wa-preview');
+  if(!ta) return;
+  ta.value=APP.curWaResa?buildHotelWaBody():'';
+}
+function getHotelWaEditedBody(){
+  const ta=document.getElementById('hotel-wa-preview');
+  const v=ta?String(ta.value).trim():'';
+  return v||buildHotelWaBody();
+}
+function buildHotelWaMessageSigned(signerName){
+  return getHotelWaEditedBody()+hotelWaSignFooter(getWaPreviewLang(), signerName);
+}
+var _hotelWaSignCallback=null;
+function promptHotelWaSignerNameThen(onOk){
+  if(typeof onOk!=='function') return;
+  _hotelWaSignCallback=onOk;
+  const m=document.getElementById('hotel-wa-sign-modal');
+  const inp=document.getElementById('hotel-wa-sign-input');
+  if(inp) inp.value='';
+  if(m) m.classList.add('show');
+  if(inp) setTimeout(function(){ try{ inp.focus(); }catch(e){} }, 50);
+}
+function closeHotelWaSignModal(){
+  const m=document.getElementById('hotel-wa-sign-modal');
+  if(m) m.classList.remove('show');
+  _hotelWaSignCallback=null;
+}
+function submitHotelWaSign(){
+  const inp=document.getElementById('hotel-wa-sign-input');
+  const name=inp?String(inp.value).trim():'';
+  if(!name){ toast('⚠️ Indique o seu nome para assinar a mensagem.','warn'); return; }
+  const cb=_hotelWaSignCallback;
+  closeHotelWaSignModal();
+  if(typeof cb==='function'){
+    try{ cb(name); }catch(e){ toast('⚠️ '+((e&&e.message)||'Erro'),'error'); }
+  }
+}
+function copyTextFallback_(msg){
+  navigator.clipboard.writeText(msg).then(()=>{
+    toast(t().toastCopy,'success');
+  }).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=msg; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast(t().toastCopy,'success');
+  });
+}
 function openWA(){
   if(!APP.curWaResa) return;
-  const langCode = getWaPreviewLang();
-  const fn = WA_HOTEL[langCode] || WA_HOTEL['PT'];
-  let msg = fn(APP.curWaResa, APP.agencyNom || APP.agencyId);
-  const tel = normaliserDigitsPourWaMe(AGENCE_WA_NUMBER);
-  const url = tel
-    ? `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`
-    : `https://wa.me/?text=${encodeURIComponent(msg)}`;
-  window.open(url, '_blank');
-  toast(t().toastHotelWa, 'hotel-wa');
+  promptHotelWaSignerNameThen(function(signer){
+    const msg=buildHotelWaMessageSigned(signer);
+    const tel=normaliserDigitsPourWaMe(AGENCE_WA_NUMBER);
+    const url=tel
+      ? `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`
+      : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+    window.open(url,'_blank');
+    toast(t().toastHotelWa,'hotel-wa');
+  });
 }
 
 function copyHotelMsg(){
   if(!APP.curWaResa) return;
-  const langCode = getWaPreviewLang();
-  const fn = WA_HOTEL[langCode] || WA_HOTEL['PT'];
-  let msg = fn(APP.curWaResa, APP.agencyNom || APP.agencyId);
-  navigator.clipboard.writeText(msg).then(() => {
-    toast(t().toastCopy, 'success');
-  }).catch(() => {
-    // Fallback
-    const ta = document.createElement('textarea');
-    ta.value = msg; ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    toast(t().toastCopy, 'success');
+  promptHotelWaSignerNameThen(function(signer){
+    copyTextFallback_(buildHotelWaMessageSigned(signer));
   });
 }
 
@@ -3397,6 +3479,7 @@ async function submitNovaReserva(){
       if(createdId){
         APP.curWaResa = waSnap;
         APP.curId = createdId;
+        refreshHotelWaPreview();
         if(confirm(T2.nvAskWa || 'WhatsApp?')) openWA();
       }
     } else {
