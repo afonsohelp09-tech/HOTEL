@@ -798,7 +798,37 @@ html[data-theme="dark"] .header .lang-app .lp.active{
   .hdr-acts .btn span{display:none}
   .hdr-acts .btn{font-size:18px}
 }
+
+/* Route map compact (Nova reserva) — PC + téléphone */
+.route-map-wrap{grid-column:1/-1;margin:4px 0 2px;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);overflow:hidden;max-width:100%;min-width:0}
+.route-map-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:7px 10px;border-bottom:1px solid var(--border2);background:var(--white)}
+.route-map-legend{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:600;color:var(--tm);flex-wrap:wrap}
+.route-map-pin{display:inline-flex;align-items:center;gap:5px}
+.route-map-dot{width:14px;height:14px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;line-height:1;flex-shrink:0}
+.route-map-dot.a{background:var(--navy)}
+.route-map-dot.b{background:var(--gold);color:var(--navy)}
+.route-map-status{font-size:10px;color:var(--ts);font-weight:500;max-width:50%;text-align:right;line-height:1.35;word-break:break-word}
+.route-map-el{height:150px;width:100%;max-width:100%;background:#dce6f0;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.route-map-el .leaflet-container{font:inherit;width:100%!important;height:100%!important}
+.route-map-el .leaflet-control-zoom a{width:32px!important;height:32px!important;line-height:32px!important;font-size:16px!important}
+.route-map-marker{width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff}
+.route-map-marker.a{background:#0D2137}
+.route-map-marker.b{background:#C9A84C;color:#0D2137}
+@media(max-width:768px){
+  .route-map-el{height:160px}
+  .route-map-bar{flex-direction:column;align-items:flex-start;gap:6px;padding:8px 10px}
+  .route-map-status{max-width:100%;text-align:left;font-size:11px}
+  .route-map-el .leaflet-control-zoom a{width:36px!important;height:36px!important;line-height:36px!important}
+  #tab-nova .m-inp,#tab-nova .m-sel,#tab-nova .m-ta{font-size:16px;min-height:44px}
+  #tab-nova .nova-actions{flex-direction:column;align-items:stretch;gap:10px}
+  #tab-nova .nova-actions .btn{width:100%;min-height:48px;justify-content:center;touch-action:manipulation}
+}
+@media(max-width:430px){
+  .route-map-el{height:148px}
+}
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="favicon.ico" type="image/x-icon" sizes="32x32">
 <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
@@ -1130,17 +1160,29 @@ html[data-theme="dark"] .header .lang-app .lp.active{
               <div class="m-field full"><div class="nova-pax-summary" id="nv-pax-summary">Total pax: 1 · Total bagagens: 0</div></div>
               <div class="m-field"><label id="lbl-nv-partida">Ponto de Partida *</label>
                 <select class="m-sel" id="nv-partida-sel" onchange="onNvLieuChange('depart')"></select>
-                <input class="m-inp" type="text" id="nv-partida-custom" style="display:none;margin-top:6px" placeholder="Nome do lugar…">
+                <input class="m-inp" type="text" id="nv-partida-custom" style="display:none;margin-top:6px" placeholder="Nome do lugar…" oninput="scheduleNvRouteMap()">
               </div>
               <div class="m-field"><label><span id="lbl-nv-end-partida">Morada de Partida</span> <span id="nv-addr-dep-req" style="font-size:10px;color:var(--ts)">(opt.)</span></label>
-                <input class="m-inp" type="text" id="nv-end-partida" placeholder="Rua, nº…">
+                <input class="m-inp" type="text" id="nv-end-partida" placeholder="Rua, nº…" oninput="scheduleNvRouteMap()">
               </div>
               <div class="m-field"><label id="lbl-nv-destino">Destino *</label>
                 <select class="m-sel" id="nv-destino-sel" onchange="onNvLieuChange('dest')"></select>
-                <input class="m-inp" type="text" id="nv-destino-custom" style="display:none;margin-top:6px" placeholder="Nome do lugar…">
+                <input class="m-inp" type="text" id="nv-destino-custom" style="display:none;margin-top:6px" placeholder="Nome do lugar…" oninput="scheduleNvRouteMap()">
               </div>
               <div class="m-field"><label><span id="lbl-nv-end-destino">Morada de Destino</span> <span id="nv-addr-dest-req" style="font-size:10px;color:var(--ts)">(opt.)</span></label>
-                <input class="m-inp" type="text" id="nv-end-destino" placeholder="Rua, nº…">
+                <input class="m-inp" type="text" id="nv-end-destino" placeholder="Rua, nº…" oninput="scheduleNvRouteMap()">
+              </div>
+              <div class="m-field full">
+                <div class="route-map-wrap" id="nv-route-map-wrap">
+                  <div class="route-map-bar">
+                    <div class="route-map-legend">
+                      <span class="route-map-pin"><span class="route-map-dot a">A</span> Partida</span>
+                      <span class="route-map-pin"><span class="route-map-dot b">B</span> Destino</span>
+                    </div>
+                    <div class="route-map-status" id="nv-route-map-status">Selecione partida / destino</div>
+                  </div>
+                  <div class="route-map-el" id="nv-route-map" role="img" aria-label="Mapa do trajeto"></div>
+                </div>
               </div>
               <div class="m-field"><label id="lbl-nv-voo">Nº Voo</label><input class="m-inp" type="text" id="nv-voo"></div>
               <div class="m-field"><label id="lbl-nv-quarto">Nº Quarto</label><input class="m-inp" type="text" id="nv-quarto"></div>
@@ -1369,7 +1411,8 @@ const APP = {
   /** Filtre rapide par carte KPI : all | pendente | confirmado | upcoming | null (ex. cancelado/realizado au menu) */
   statCardFilter:'all',
   /** Tri tableau : clé (id|client|date|hour|route|pax|price|statut) ou null ; dir 1 = asc, -1 = desc */
-  tblSortKey:null,tblSortDir:1
+  tblSortKey:null,tblSortDir:1,
+  _lieuxAt:0,_novaDefaultsApplied:false,_lastNvRouteKey:''
 };
 
 /* Session : actualizar página não desconecta ; saída automática após 3 h sem atividade. */
@@ -1692,7 +1735,17 @@ function switchTab(tab){
   document.getElementById('tab-btn-' + tab).classList.add('active');
   document.getElementById('tab-' + tab).classList.add('active');
   if(tab === 'upcoming') renderUpcoming();
-  if(tab === 'nova'){ renderNovaLock(); loadHotelLieux(); }
+  if(tab === 'nova'){
+    renderNovaLock();
+    loadHotelLieux({ soft:true }).then(()=>{
+      setTimeout(()=>{
+        try{
+          const inst=_routeMapInst.nv;
+          if(inst&&inst.map) inst.map.invalidateSize();
+        }catch(e){}
+      },80);
+    });
+  }
   if(tab === 'historico') renderHistoricoList();
 }
 
@@ -1837,7 +1890,7 @@ function updateSessionBar(){
 }
 
 /* ─── Nouvelles réservations : contrôle périodique (API) + Notification navigateur ─── */
-const NOTIF_POLL_MS = 60000;
+const NOTIF_POLL_MS = 120000;
 const NOTIF_LS = 'nlp_ag_notif_enabled';
 let _agencyPollTimer = null;
 let _notifBaselineReady = false;
@@ -1907,6 +1960,8 @@ async function fetchAllReservationsUnfiltered() {
 }
 async function pollNewReservations() {
   if (!APP.token || !checkApiConfig()) return;
+  if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+  if (APP.curTab === 'nova') return;
   try {
     const d = await fetchAllReservationsUnfiltered();
     if (!d.success) {
@@ -1943,7 +1998,11 @@ async function pollNewReservations() {
     } else {
       toast('🔔 ' + (newIds.length === 1 ? (T.notifTitle + ' — ' + newIds[0]) : (String(newIds.length) + ' ' + T.notifMany)), 'notif');
     }
-    loadReservas({ quiet: true });
+    // Réutilise la liste déjà reçue — évite un 2e fetch complet
+    APP.reservas = list;
+    APP.page = 1;
+    try { renderTable(); } catch (e) {}
+    if (APP.curTab === 'upcoming') renderUpcoming();
   } catch (e) {}
 }
 function startAgencyReservationPolling() {
@@ -2750,8 +2809,12 @@ function resetNovaForm(){
   const origem = document.getElementById('nv-origem'); if(origem) origem.value = 'hotel';
   const msgEl = document.getElementById('nova-msg'); if(msgEl) msgEl.className = 'nova-msg';
   fillHotelLieuSelects();
+  APP._novaDefaultsApplied=false;
+  APP._lastNvRouteKey='';
   applyHotelOrigDefaults();
+  APP._novaDefaultsApplied=true;
   updateNovaPaxSummary();
+  scheduleNvRouteMap();
 }
 
 function onNvCountSelect(baseId){
@@ -2796,18 +2859,231 @@ function updateNovaPaxSummary(){
 function escAttrH_(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 function escHtmlH_(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-async function loadHotelLieux(){
-  if(!APP.agencyId || !APP.token) return;
+// ═══════════════════════════════════════════════════════════════════
+// ROUTE MAP — prévisualisation compacte Partida (A) / Destino (B)
+// ═══════════════════════════════════════════════════════════════════
+const ROUTE_MAP_LISBON=[38.7223,-9.1393];
+const _routeGeoCache=Object.create(null);
+const _routeMapInst={};
+
+function routeMapDivIcon_(letter,cls){
+  return L.divIcon({
+    className:'',
+    html:`<div class="route-map-marker ${cls}">${letter}</div>`,
+    iconSize:[22,22],
+    iconAnchor:[11,11],
+    popupAnchor:[0,-12]
+  });
+}
+function ensureRouteMap_(key,elId){
+  if(typeof L==='undefined') return null;
+  if(_routeMapInst[key]&&_routeMapInst[key].map) return _routeMapInst[key];
+  const el=document.getElementById(elId);
+  if(!el) return null;
+  const prevToken=(_routeMapInst[key]&&_routeMapInst[key]._token)||0;
+  const map=L.map(el,{
+    zoomControl:false,
+    attributionControl:true,
+    scrollWheelZoom:false,
+    dragging:true,
+    tap:true,
+    touchZoom:true,
+    doubleClickZoom:true,
+    boxZoom:false
+  });
+  L.control.zoom({position:'topright'}).addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:18,
+    attribution:'© OSM'
+  }).addTo(map);
+  map.setView(ROUTE_MAP_LISBON,11);
+  _routeMapInst[key]={map,layer:L.layerGroup().addTo(map),elId,_token:prevToken};
+  setTimeout(()=>{try{map.invalidateSize();}catch(e){}},80);
+  return _routeMapInst[key];
+}
+async function geocodeRouteQuery_(q){
+  const query=String(q||'').trim();
+  if(!query||query.length<2) return null;
+  const key=query.toLowerCase();
+  if(_routeGeoCache[key]!==undefined) return _routeGeoCache[key];
   try{
-    const d = await api({ action:'getListaLieux', agencyId:APP.agencyId, token:APP.token, _t:Date.now() });
+    const url='https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=pt&q='+encodeURIComponent(query);
+    const res=await fetch(url,{headers:{'Accept':'application/json'}});
+    if(!res.ok){_routeGeoCache[key]=null;return null;}
+    const data=await res.json();
+    if(!data||!data.length){_routeGeoCache[key]=null;return null;}
+    const hit={lat:parseFloat(data[0].lat),lng:parseFloat(data[0].lon)};
+    _routeGeoCache[key]=hit;
+    return hit;
+  }catch(e){
+    _routeGeoCache[key]=null;
+    return null;
+  }
+}
+function buildRouteGeoQuery_(name,addr){
+  const a=String(addr||'').trim();
+  const n=String(name||'').trim();
+  if(a) return /portugal|lisboa|lisbon|cascais|sintra/i.test(a)?a:(a+', Portugal');
+  if(n) return /portugal|lisboa|lisbon/i.test(n)?n:(n+', Portugal');
+  return '';
+}
+async function refreshRouteMap_(opts){
+  if(opts && opts._skip){
+    const inst=_routeMapInst[opts.key];
+    if(inst&&inst.map) setTimeout(()=>{try{inst.map.invalidateSize();}catch(e){}},40);
+    return;
+  }
+  const key=opts.key;
+  const statusEl=document.getElementById(opts.statusId);
+  const inst=ensureRouteMap_(key,opts.mapId);
+  if(!inst){
+    if(statusEl) statusEl.textContent='Mapa indisponível';
+    return;
+  }
+  const depQ=buildRouteGeoQuery_(opts.depName,opts.depAddr);
+  const destQ=buildRouteGeoQuery_(opts.destName,opts.destAddr);
+  if(statusEl){
+    if(!depQ&&!destQ) statusEl.textContent='Selecione partida / destino';
+    else statusEl.textContent='A localizar…';
+  }
+  const [depHit,destHit]=await Promise.all([
+    depQ?geocodeRouteQuery_(depQ):Promise.resolve(null),
+    destQ?geocodeRouteQuery_(destQ):Promise.resolve(null)
+  ]);
+  if(opts.token!=null && opts.token!==_routeMapInst[key]._token) return;
+  inst.layer.clearLayers();
+  const pts=[];
+  if(depHit){
+    const m=L.marker([depHit.lat,depHit.lng],{icon:routeMapDivIcon_('A','a'),title:opts.depName||'Partida'});
+    m.bindPopup('<strong>A · Partida</strong><br>'+escHtmlH_(opts.depName||'')+(opts.depAddr?'<br><span style="font-size:11px;color:#64748b">'+escHtmlH_(opts.depAddr)+'</span>':''));
+    inst.layer.addLayer(m);
+    pts.push([depHit.lat,depHit.lng]);
+  }
+  if(destHit){
+    const m=L.marker([destHit.lat,destHit.lng],{icon:routeMapDivIcon_('B','b'),title:opts.destName||'Destino'});
+    m.bindPopup('<strong>B · Destino</strong><br>'+escHtmlH_(opts.destName||'')+(opts.destAddr?'<br><span style="font-size:11px;color:#64748b">'+escHtmlH_(opts.destAddr)+'</span>':''));
+    inst.layer.addLayer(m);
+    pts.push([destHit.lat,destHit.lng]);
+  }
+  if(pts.length===2){
+    inst.layer.addLayer(L.polyline(pts,{color:'#0D2137',weight:2.5,opacity:.75,dashArray:'6 5'}));
+    try{inst.map.fitBounds(L.latLngBounds(pts).pad(0.28));}catch(e){}
+    if(statusEl) statusEl.textContent=(opts.depName||'A')+' → '+(opts.destName||'B');
+  }else if(pts.length===1){
+    inst.map.setView(pts[0],13);
+    if(statusEl) statusEl.textContent=depHit?(opts.depName||'Partida'):(opts.destName||'Destino');
+  }else{
+    inst.map.setView(ROUTE_MAP_LISBON,11);
+    if(statusEl){
+      if(depQ||destQ) statusEl.textContent='Localização não encontrada';
+      else statusEl.textContent='Selecione partida / destino';
+    }
+  }
+  setTimeout(()=>{try{inst.map.invalidateSize();}catch(e){}},60);
+}
+function scheduleRouteMapRefresh_(stateKey,builder){
+  const bucket=_routeMapInst._sched=_routeMapInst._sched||{};
+  clearTimeout(bucket[stateKey]);
+  bucket[stateKey]=setTimeout(()=>{
+    const opts=builder();
+    if(!_routeMapInst[opts.key]) _routeMapInst[opts.key]={};
+    _routeMapInst[opts.key]._token=(_routeMapInst[opts.key]._token||0)+1;
+    opts.token=_routeMapInst[opts.key]._token;
+    refreshRouteMap_(opts);
+  },450);
+}
+function getNvRoutePoint_(which){
+  const isDep=which==='depart';
+  const name=getNvLieuValue(which);
+  const addrEl=document.getElementById(isDep?'nv-end-partida':'nv-end-destino');
+  let addr=(addrEl&&addrEl.value||'').trim();
+  if(!addr){
+    const sel=document.getElementById(isDep?'nv-partida-sel':'nv-destino-sel');
+    const opt=sel&&sel.selectedOptions&&sel.selectedOptions[0];
+    if(opt&&sel.value&&sel.value!=='__custom__') addr=(opt.getAttribute('data-adresse')||'').trim();
+  }
+  // Fallback morada hotel
+  const hotel=(APP.agencyNom||'').trim();
+  if(!addr && hotel && name===hotel && APP.hotelAdresse) addr=String(APP.hotelAdresse).trim();
+  return {name,addr};
+}
+function scheduleNvRouteMap(){
+  scheduleRouteMapRefresh_('nv',()=>{
+    const dep=getNvRoutePoint_('depart');
+    const dest=getNvRoutePoint_('dest');
+    const key=[dep.name,dep.addr,dest.name,dest.addr].join('|');
+    if(key===APP._lastNvRouteKey && _routeMapInst.nv && _routeMapInst.nv.map){
+      return {
+        key:'nv',
+        mapId:'nv-route-map',
+        statusId:'nv-route-map-status',
+        depName:dep.name,
+        depAddr:dep.addr,
+        destName:dest.name,
+        destAddr:dest.addr,
+        _skip:true
+      };
+    }
+    APP._lastNvRouteKey=key;
+    return {
+      key:'nv',
+      mapId:'nv-route-map',
+      statusId:'nv-route-map-status',
+      depName:dep.name,
+      depAddr:dep.addr,
+      destName:dest.name,
+      destAddr:dest.addr
+    };
+  });
+}
+function invalidateNvRouteMap_(){
+  setTimeout(()=>{
+    try{
+      const inst=_routeMapInst.nv;
+      if(inst&&inst.map) inst.map.invalidateSize();
+    }catch(e){}
+  },120);
+}
+(function bindNvRouteMapViewport_(){
+  let t;
+  const run=()=>{ clearTimeout(t); t=setTimeout(invalidateNvRouteMap_,200); };
+  window.addEventListener('resize',run,{passive:true});
+  window.addEventListener('orientationchange',run,{passive:true});
+})();
+
+async function loadHotelLieux(opts){
+  opts=opts||{};
+  const force=!!opts.force;
+  const soft=!!opts.soft;
+  if(!APP.agencyId || !APP.token) return;
+  const TTL=180000;
+  const fresh=APP.lieux.length && APP._lieuxAt && (Date.now()-APP._lieuxAt)<TTL;
+  if(!force && fresh){
+    fillHotelLieuSelects({preserve:true});
+    if(!APP._novaDefaultsApplied){
+      applyHotelOrigDefaults();
+      APP._novaDefaultsApplied=true;
+    }else if(!soft){
+      scheduleNvRouteMap();
+    }
+    return;
+  }
+  try{
+    const d = await api({ action:'getListaLieux', agencyId:APP.agencyId, token:APP.token });
     if(d.success){
       APP.lieux = (d.lieux || []).filter(l => l.actif !== false && !/agence\s*ruelas/i.test(l.nom||''));
       if(d.hotelAdresse) APP.hotelAdresse = d.hotelAdresse;
       if(d.hotelNom) APP.agencyNom = d.hotelNom;
+      APP._lieuxAt=Date.now();
     }
   }catch(e){}
-  fillHotelLieuSelects();
-  applyHotelOrigDefaults();
+  fillHotelLieuSelects({preserve:true});
+  if(!APP._novaDefaultsApplied){
+    applyHotelOrigDefaults();
+    APP._novaDefaultsApplied=true;
+  }else{
+    scheduleNvRouteMap();
+  }
 }
 
 function hotelLieuxForRole_(role){
@@ -2819,14 +3095,17 @@ function hotelLieuxForRole_(role){
   });
 }
 
-function fillHotelLieuSelects(){
-  fillOneHotelLieuSelect_('nv-partida-sel', 'depart');
-  fillOneHotelLieuSelect_('nv-destino-sel', 'arrivee');
-  onNvLieuChange('depart');
-  onNvLieuChange('dest');
+function fillHotelLieuSelects(opts){
+  opts=opts||{};
+  fillOneHotelLieuSelect_('nv-partida-sel', 'depart', opts.preserve);
+  fillOneHotelLieuSelect_('nv-destino-sel', 'arrivee', opts.preserve);
+  if(!opts.preserve){
+    onNvLieuChange('depart');
+    onNvLieuChange('dest');
+  }
 }
 
-function fillOneHotelLieuSelect_(selId, role){
+function fillOneHotelLieuSelect_(selId, role, preserve){
   const sel = document.getElementById(selId);
   if(!sel) return;
   const prev = sel.value;
@@ -2842,6 +3121,9 @@ function fillOneHotelLieuSelect_(selId, role){
   html += `<option value="__custom__">✏️ Outro (escrever…)</option>`;
   sel.innerHTML = html;
   if(prev && [...sel.options].some(o=>o.value===prev)) sel.value = prev;
+  if(!preserve){
+    // caller handles onNvLieuChange
+  }
 }
 
 function onNvLieuChange(which){
@@ -2859,10 +3141,16 @@ function onNvLieuChange(which){
   const opt = sel.selectedOptions && sel.selectedOptions[0];
   const preAdr = opt ? (opt.getAttribute('data-adresse') || '') : '';
   if(!isCustom && addr && preAdr && !addr.value) addr.value = preAdr;
+  // Hotel sélectionné → forcer morada de la fiche si vide
+  const hotel = (APP.agencyNom||'').trim();
+  if(!isCustom && hotel && sel.value === hotel && APP.hotelAdresse && addr && !addr.value){
+    addr.value = APP.hotelAdresse;
+  }
   if(req){
     req.textContent = isCustom ? '* obrig.' : '(opt.)';
     req.style.color = isCustom ? 'var(--danger,#c0392b)' : 'var(--ts)';
   }
+  scheduleNvRouteMap();
 }
 
 function getNvLieuValue(which){
@@ -2900,6 +3188,7 @@ function applyHotelOrigDefaults(){
     const a = document.getElementById('nv-end-destino');
     if(a && !a.value) a.value = APP.hotelAdresse;
   }
+  scheduleNvRouteMap();
 }
 
 function formatPaxDetailLine_(r){
