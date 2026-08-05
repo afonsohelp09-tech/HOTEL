@@ -32,7 +32,9 @@
 ║     agence de voyage) ; le login utilise toujours action=connexionAgence    ║
 ║  ✅ Onglet "Nova" — création de réservation par l'hôtel                     ║
 ║  ✅ Onglet "Histórico" — historique des actions par réservation             ║
-║  ✅ Confirmation WhatsApp de l'HÔTEL vers l'AGENCE (Agence Ruelas)          ║
+║  ✅ Demande de disponibilité WhatsApp HÔTEL → AGENCE (pas de contact client)║
+║  ✅ Contact client (confirmation WA/SMS) = hors app, à la charge de l'hôtel ║
+║  ✅ Confirmation / annulation / prix dans le système = AGENCE uniquement    ║
 ║  ✅ Vue Timeline "Prochains Transfers"                                       ║
 ║  ✅ Navigation modale ← →  + clavier                                        ║
 ║  ✅ Export Excel (2 onglets) + PDF imprimable                                ║
@@ -855,7 +857,7 @@ html[data-theme="dark"] .header .lang-app .lp.active{
       <button class="btn-primary" id="login-btn" onclick="doLogin()">
         <div class="sp"></div><span class="btn-t" id="lbl-login-btn">Entrar</span>
       </button>
-      <div class="toggle-link" style="cursor:default;opacity:.85;pointer-events:none" id="lbl-reset-link">🔐 Palavra-passe definida pela Agência</div>
+      <div class="toggle-link" id="lbl-reset-link" onclick="showReset()" style="cursor:pointer">🔐 Alterar / Recuperar palavra-passe (email da ficha)</div>
     </div>
 
     <!-- Step 2 : Demander code reset -->
@@ -871,8 +873,8 @@ html[data-theme="dark"] .header .lang-app .lp.active{
       <div class="field"><label id="lbl-r1-id">Identificador do Hotel</label>
         <input type="text" id="r1-id" placeholder="HOT001">
       </div>
-      <div class="field"><label id="lbl-r1-email">Email registado</label>
-        <input type="email" id="r1-email" placeholder="email@agencia.pt">
+      <div class="field"><label id="lbl-r1-email">Email registado na ficha (definido pela Agência)</label>
+        <input type="email" id="r1-email" placeholder="email@hotel.pt">
       </div>
       <button class="btn-primary" id="r1-btn" onclick="doDemandarCodigo()">
         <div class="sp"></div><span class="btn-t" id="lbl-r1-btn">Enviar Código</span>
@@ -986,8 +988,8 @@ html[data-theme="dark"] .header .lang-app .lp.active{
         <div class="card-hdr">
           <div class="card-ttl" id="lbl-card-ttl">Reservas Atribuídas</div>
           <div class="hdr-acts">
-            <button class="btn btn-ghost btn-sm" onclick="exportExcel()">📊 <span id="lbl-exp-excel">Excel</span></button>
-            <button class="btn btn-ghost btn-sm" onclick="exportPDF()">🖨️ <span id="lbl-exp-pdf">PDF</span></button>
+            <button class="btn btn-ghost btn-sm" onclick="exportExcel()" title="Só reservas criadas por este hotel">📊 <span id="lbl-exp-excel">Excel</span></button>
+            <button class="btn btn-ghost btn-sm" onclick="exportPDF()" title="Só reservas criadas por este hotel">🖨️ <span id="lbl-exp-pdf">PDF</span></button>
             <button class="btn btn-navy btn-sm" onclick="loadReservas()">↻ <span id="lbl-refresh-txt">Atualizar</span></button>
           </div>
         </div>
@@ -1147,7 +1149,7 @@ html[data-theme="dark"] .header .lang-app .lp.active{
           </div>
           <div class="nova-actions">
             <button class="btn btn-ghost btn-sm" type="button" onclick="resetNovaForm()" id="lbl-nv-clear">Limpar</button>
-            <button class="btn btn-navy btn-sm" type="button" onclick="submitNovaReserva()" id="btn-nv-submit">➕ <span id="lbl-nv-submit">Criar Reserva</span></button>
+            <button class="btn btn-navy btn-sm" type="button" onclick="submitNovaReserva()" id="btn-nv-submit">💾 <span id="lbl-nv-submit">Guardar</span></button>
           </div>
         </div>
       </div>
@@ -1229,13 +1231,13 @@ html[data-theme="dark"] .header .lang-app .lp.active{
         </div>
       </div>
 
-      <!-- ══ WA HÔTEL — Confirmer à l'hôtel ══ -->
+      <!-- ══ WA HÔTEL — Demande de disponibilité à l'Agence ══ -->
       <div class="hotel-wa-box" id="hotel-wa-box">
         <div class="hotel-wa-ttl">
-          🏨 <span id="lbl-hotel-wa-ttl">Confirmar ao hotel — via WhatsApp</span>
+          💬 <span id="lbl-hotel-wa-ttl">Pedir disponibilidade à Agência — WhatsApp</span>
         </div>
         <div class="hotel-wa-desc" id="lbl-hotel-wa-desc">
-          Envie esta mensagem ao hotel para confirmar que a sua agência aceita este transfer. O hotel irá registar a confirmação no sistema.
+          Após guardar, envie esta mensagem à Agência Ruelas para pedir disponibilidade. A agência confirma, cancela ou ajusta o preço no sistema.
         </div>
         <div class="m-field" style="margin-top:12px">
           <label id="lbl-wa-prev-lang">Idioma da mensagem / pré-visualização</label>
@@ -1247,13 +1249,29 @@ html[data-theme="dark"] .header .lang-app .lp.active{
           </select>
         </div>
         <div class="hotel-wa-btns">
-          <button class="btn btn-hotel-wa btn-sm" onclick="openWA('hotel')">
-            🏨 <span id="lbl-hotel-wa-btn">Confirmar ao Hotel via WhatsApp</span>
+          <button class="btn btn-hotel-wa btn-sm" onclick="openWA()">
+            💬 <span id="lbl-hotel-wa-btn">Pedir disponibilidade via WhatsApp</span>
           </button>
           <button class="btn btn-ghost btn-sm" onclick="copyHotelMsg()">
             📋 <span id="lbl-copy-msg">Copiar Mensagem</span>
           </button>
         </div>
+      </div>
+
+      <!-- Édition hôtel (champs selon statut) -->
+      <div class="modal-sec" id="hotel-edit-sec" style="display:none">✏️ <span id="lbl-hotel-edit-sec">Editar reserva</span></div>
+      <div id="hotel-edit-box" style="display:none">
+        <div class="m-field" id="he-wrap-nom"><label id="lbl-he-nom">Nome do cliente</label><input class="m-inp" type="text" id="he-nom"></div>
+        <div class="m-field" id="he-wrap-tel"><label id="lbl-he-tel">Telefone</label><input class="m-inp" type="tel" id="he-tel"></div>
+        <div class="m-field" id="he-wrap-vol"><label id="lbl-he-vol">Nº Voo</label><input class="m-inp" type="text" id="he-vol"></div>
+        <div class="m-field" id="he-wrap-depart"><label id="lbl-he-depart">Partida</label><input class="m-inp" type="text" id="he-depart"></div>
+        <div class="m-field" id="he-wrap-dest"><label id="lbl-he-dest">Destino</label><input class="m-inp" type="text" id="he-dest"></div>
+        <div class="m-field" id="he-wrap-date"><label id="lbl-he-date">Data</label><input class="m-inp" type="date" id="he-date"></div>
+        <div class="m-field" id="he-wrap-heure"><label id="lbl-he-heure">Hora</label><input class="m-inp" type="time" id="he-heure"></div>
+        <div class="m-field" id="he-wrap-room"><label id="lbl-he-room">Quarto</label><input class="m-inp" type="text" id="he-room"></div>
+        <div class="m-field" id="he-wrap-com"><label id="lbl-he-com">Comentário</label><textarea class="m-ta" id="he-com" rows="2"></textarea></div>
+        <button class="btn btn-navy btn-sm" type="button" id="btn-hotel-save-edit" onclick="saveHotelEdit()" style="margin-top:8px">💾 <span id="lbl-btn-hotel-save">Guardar alterações</span></button>
+        <div class="modal-msg" id="he-msg" style="margin-top:8px"></div>
       </div>
 
       <!-- Actions -->
@@ -1288,17 +1306,21 @@ html[data-theme="dark"] .header .lang-app .lp.active{
 // TRADUCTIONS
 // ═══════════════════════════════════════════════════════════════════
 const UI = {
-  PT:{loginTitle:'🔐 Portal Hotel',agId:'Identificador do Hotel',agPass:'Palavra-passe',loginBtn:'Entrar',resetLink:'Alterar / Recuperar palavra-passe',r1Title:'🔑 Recuperar Palavra-passe',r1Sub:'Introduza o identificador do hotel e o email registado',r1Id:'Identificador do Hotel',r1Email:'Email registado na conta',r1Btn:'Enviar Código',back1:'Voltar ao login',r2Title:'📧 Verificar Código',r2Sub:'Código enviado para o seu email',r2Code:'Código de verificação (6 dígitos)',r2New:'Nova palavra-passe (min. 8 car.)',r2Cf:'Confirmar nova palavra-passe',r2Btn:'Alterar Palavra-passe',r2Hint:'O código é válido durante 15 minutos',back2:'Pedir novo código',errEmpty:'Preencha todos os campos.',errConn:'Erro de ligação.',errPwMatch:'As palavras-passe não coincidem.',errPwShort:'Mínimo 8 caracteres.',okPwChanged:'✅ Palavra-passe alterada com sucesso!',sTotal:'Total',sPend:'Pendentes',sConf:'Confirmadas',sUpcoming:'A Realizar',cardTtl:'Reservas Atribuídas',expExcel:'Excel',expPdf:'PDF',refreshTxt:'Atualizar',fSearch:'Pesquisa',fSearchPh:'ID, cliente, email, telefone…',fDestPh:'Aeroporto, hotel, Oriente…',filtActive:'Filtros ativos',filtResults:'resultado(s)',fStatut:'Estatuto',fAll:'Todos',fPend:'⏳ Pendente',fConf:'✅ Confirmado',fCanc:'❌ Cancelado',fReal:'🏁 Realizado',fDs:'Data início',fDe:'Data fim',fDest:'Destino',fDestAll:'Todos',btnFilter:'Filtrar',btnReset:'Limpar',loading:'A carregar…',logout:'⎋ Sair',modalTtl:'Detalhes da Reserva',modalActions:'⚡ Ações',mPrix:'Preço (€)',mComment:'Comentário (opcional)',btnClose:'Fechar',btnCancel:'Cancelar',btnConfirm:'Confirmar',btnPrice:'Alterar Preço',btnPago:'Transfer pago',lblPayment:'Pagamento',toastPago:'💶 Transfer marcado como pago',msgPago:'💶 Transfer pago!',waTtl:'Confirmação WhatsApp → Cliente',waPhone:'WhatsApp cliente',waBtn:'Abrir WhatsApp → Cliente',hotelWaTtl:'Confirmar à Agência Ruelas — via WhatsApp',hotelWaDesc:'Envie esta mensagem à Agência Ruelas para confirmar que o hotel aceita este transfer. A agência irá registar a confirmação no sistema.',hotelWaBtn:'Confirmar à Agência via WhatsApp',copyMsg:'Copiar Mensagem',calTtl:'Adicionar ao Calendário',colRef:'Ref.',colClient:'Cliente',colDate:'Data',colHour:'Hora',colRoute:'Trajet',colPax:'Pax',colPrice:'Preço',colStatus:'Estado',colActs:'Ações',emptyTitle:'Nenhuma reserva encontrada',emptySub:'Tente ajustar os filtros.',toastConf:'✅ Confirmada com sucesso',toastCanc:'❌ Cancelada',toastExcel:'📊 Excel exportado',toastPdf:'🖨️ PDF impresso',toastWa:'💬 WhatsApp aberto!',toastHotelWa:'🏨 Mensagem de confirmação enviada à agência!',toastPrice:'💶 Preço atualizado',toastCopy:'📋 Mensagem copiada!',confirmCancel:'Cancelar a reserva',msgConf:'✅ Reserva confirmada!',msgCanc:'❌ Reserva cancelada.',msgPrice:'💶 Preço atualizado!',pageOf:'de',lblClient:'Cliente',lblEmail:'Email',lblPhone:'Telefone',lblOta:'Ref. OTA',lblDate:'Data / Hora',lblPaxMalas:'Pax / Malas',lblOrigin:'Partida',lblAddrDep:'Morada Partida',lblDest:'Destino',lblAddrDest:'Morada Destino',lblFlight:'Nº Voo',lblTransport:'Nº Transporte',lblRoom:'Quarto',lblPrice:'Preço',lblStatus:'Estado',lblComments:'Comentários',tabAll:'Todas as Reservas',tabUpcoming:'Próximas Transferências',tabNova:'Nova Reserva',tabHistorico:'Histórico',upcomingTitle:'Próximas Transferências',upcomingSub:'Transfers futuros não realizados — por ordem cronológica',upcomingEmpty:'Nenhum transfer futuro pendente.',today:'Hoje',tomorrow:'Amanhã',emailPrevSec:'📧 Pré-visualização do texto enviado',waPrevLang:'Idioma da mensagem (lista)',payIncl:'Incluir modo de pagamento no texto',payModeLbl:'Modo de pagamento',payOff:'(não mostrar linha)',paySheet:'Definição da agência (gestão de acessos)',payDriver:'Numerário ao motorista',payRecep:'Numerário na receção do hotel',payCustomOpt:'Personalizado (texto livre)',payCustomLbl:'Texto personalizado (igual em todas as línguas)',payCustomPh:'Ex.: Pagamento no local…',
-  novaTtl:'Nova Reserva',novaLockedTtl:'Criação de reservas desativada',novaLockedSub:'Contacte a Agência Ruelas para ativar esta funcionalidade para o seu hotel.',nvNom:'Nome do Cliente *',nvEmail:'Email *',nvTel:'Telefone *',nvOta:'Ref. OTA / Reserva',nvOrigem:'Origem do Transfer',nvData:'Data do Transfer *',nvHora:'Hora do Transfer *',nvAdultos:'Adultos *',nvBebes:'Bebés',nvCadeiraRodas:'Cadeira de rodas',nvCadeiraBebe:'Cadeira auto bebé',nvMalasGrandes:'Malas grandes',nvMochilas:'Mochilas',nvPaxSummary:'Total pax: {p} · Total bagagens: {b}',nvErrAdultos:'⚠️ Indique pelo menos 1 adulto',nvErrLieu:'⚠️ Selecione partida e destino',nvErrAddrDep:'⚠️ Morada de partida obrigatória quando o lugar não está na lista',nvErrAddrDest:'⚠️ Morada de destino obrigatória quando o lugar não está na lista',nvPartida:'Ponto de Partida *',nvEndPartida:'Morada de Partida',nvDestino:'Destino *',nvEndDestino:'Morada de Destino',nvVoo:'Nº Voo',nvQuarto:'Nº Quarto',nvCom:'Comentário (opcional)',nvOAirport:'✈ Aeroporto',nvOHotel:'🏨 Hotel',nvOBus:'🚌 Autocarro',nvOTrain:'🚂 Comboio',nvOHighspeed:'🚄 Alta Velocidade',nvClear:'Limpar',nvSubmit:'Criar Reserva',nvSubmitting:'A criar…',nvOk:'✅ Reserva criada com sucesso',nvErrRequired:'⚠️ Preencha os campos obrigatórios (*)',nvErrEmail:'⚠️ Email inválido',
+  PT:{loginTitle:'🔐 Portal Hotel',agId:'Identificador do Hotel',agPass:'Palavra-passe',loginBtn:'Entrar',resetLink:'Alterar / Recuperar via email da ficha',r1Title:'🔑 Recuperar Palavra-passe',r1Sub:'Introduza o ID do hotel e o email definido pela Agência na ficha',r1Id:'Identificador do Hotel',r1Email:'Email da ficha (definido pela Agência)',r1Btn:'Enviar Código',back1:'Voltar ao login',r2Title:'📧 Verificar Código',r2Sub:'Código enviado para o seu email',r2Code:'Código de verificação (6 dígitos)',r2New:'Nova palavra-passe (min. 8 car.)',r2Cf:'Confirmar nova palavra-passe',r2Btn:'Alterar Palavra-passe',r2Hint:'O código é válido durante 15 minutos',back2:'Pedir novo código',errEmpty:'Preencha todos os campos.',errConn:'Erro de ligação.',errPwMatch:'As palavras-passe não coincidem.',errPwShort:'Mínimo 8 caracteres.',okPwChanged:'✅ Palavra-passe alterada com sucesso!',sTotal:'Total',sPend:'Pendentes',sConf:'Confirmadas',sUpcoming:'A Realizar',cardTtl:'Reservas Atribuídas',expExcel:'Excel',expPdf:'PDF',expOnlyOwn:'Sem reservas criadas por este hotel para exportar.',expNoMatch:'Nenhuma reserva da vista atual criada por este hotel.',refreshTxt:'Atualizar',fSearch:'Pesquisa',fSearchPh:'ID, cliente, email, telefone…',fDestPh:'Aeroporto, hotel, Oriente…',filtActive:'Filtros ativos',filtResults:'resultado(s)',fStatut:'Estatuto',fAll:'Todos',fPend:'⏳ Pendente',fConf:'✅ Confirmado',fCanc:'❌ Cancelado',fReal:'🏁 Realizado',fDs:'Data início',fDe:'Data fim',fDest:'Destino',fDestAll:'Todos',btnFilter:'Filtrar',btnReset:'Limpar',loading:'A carregar…',logout:'⎋ Sair',modalTtl:'Detalhes da Reserva',modalActions:'⚡ Ações',mPrix:'Preço (€)',mComment:'Comentário (opcional)',btnClose:'Fechar',btnCancel:'Cancelar',btnConfirm:'Confirmar',btnPrice:'Alterar Preço',btnPago:'Transfer pago',lblPayment:'Pagamento',toastPago:'💶 Transfer marcado como pago',msgPago:'💶 Transfer pago!',waTtl:'Confirmação WhatsApp → Cliente',waPhone:'WhatsApp cliente',waBtn:'Abrir WhatsApp → Cliente',hotelWaTtl:'Pedir disponibilidade à Agência — WhatsApp',hotelWaDesc:'Após guardar, envie esta mensagem à Agência Ruelas para pedir disponibilidade. A agência confirma, cancela ou ajusta o preço no sistema.',hotelWaBtn:'Pedir disponibilidade via WhatsApp',copyMsg:'Copiar Mensagem',calTtl:'Adicionar ao Calendário',colRef:'Ref.',colClient:'Cliente',colDate:'Data',colHour:'Hora',colRoute:'Trajet',colPax:'Pax',colPrice:'Preço',colStatus:'Estado',colActs:'Ações',emptyTitle:'Nenhuma reserva encontrada',emptySub:'Tente ajustar os filtros.',toastConf:'✅ Confirmada com sucesso',toastCanc:'❌ Cancelada',toastExcel:'📊 Excel exportado',toastPdf:'🖨️ PDF impresso',toastWa:'💬 WhatsApp aberto!',toastHotelWa:'💬 Pedido de disponibilidade enviado à agência!',toastPrice:'💶 Preço atualizado',toastCopy:'📋 Mensagem copiada!',confirmCancel:'Cancelar a reserva',msgConf:'✅ Reserva confirmada!',msgCanc:'❌ Reserva cancelada.',msgPrice:'💶 Preço atualizado!',pageOf:'de',lblClient:'Cliente',lblEmail:'Email',lblPhone:'Telefone',lblOta:'Ref. OTA',lblDate:'Data / Hora',lblPaxMalas:'Pax / Malas',lblOrigin:'Partida',lblAddrDep:'Morada Partida',lblDest:'Destino',lblAddrDest:'Morada Destino',lblFlight:'Nº Voo',lblTransport:'Nº Transporte',lblRoom:'Quarto',lblPrice:'Preço',lblStatus:'Estado',lblComments:'Comentários',tabAll:'Todas as Reservas',tabUpcoming:'Próximas Transferências',tabNova:'Nova Reserva',tabHistorico:'Histórico',upcomingTitle:'Próximas Transferências',upcomingSub:'Transfers futuros não realizados — por ordem cronológica',upcomingEmpty:'Nenhum transfer futuro pendente.',today:'Hoje',tomorrow:'Amanhã',emailPrevSec:'📧 Pré-visualização do texto enviado',waPrevLang:'Idioma da mensagem (lista)',payIncl:'Incluir modo de pagamento no texto',payModeLbl:'Modo de pagamento',payOff:'(não mostrar linha)',paySheet:'Definição da agência (gestão de acessos)',payDriver:'Numerário ao motorista',payRecep:'Numerário na receção do hotel',payCustomOpt:'Personalizado (texto livre)',payCustomLbl:'Texto personalizado (igual em todas as línguas)',payCustomPh:'Ex.: Pagamento no local…',
+  hotelEditSec:'Editar reserva',heNom:'Nome do cliente',heTel:'Telefone',heVol:'Nº Voo',heDepart:'Partida',heDest:'Destino',heDate:'Data',heHeure:'Hora',heRoom:'Quarto',heCom:'Comentário',btnHotelSave:'Guardar alterações',hotelSaveOk:'✅ Alterações guardadas',hotelSaveErr:'Erro ao guardar',hotelEditLocked:'Após confirmação pela agência, só pode alterar o nome do cliente e o nº de voo.',
+  novaTtl:'Nova Reserva',novaLockedTtl:'Criação de reservas desativada',novaLockedSub:'Contacte a Agência Ruelas para ativar esta funcionalidade para o seu hotel.',nvNom:'Nome do Cliente *',nvEmail:'Email *',nvTel:'Telefone *',nvOta:'Ref. OTA / Reserva',nvOrigem:'Origem do Transfer',nvData:'Data do Transfer *',nvHora:'Hora do Transfer *',nvAdultos:'Adultos *',nvBebes:'Bebés',nvCadeiraRodas:'Cadeira de rodas',nvCadeiraBebe:'Cadeira auto bebé',nvMalasGrandes:'Malas grandes',nvMochilas:'Mochilas',nvPaxSummary:'Total pax: {p} · Total bagagens: {b}',nvErrAdultos:'⚠️ Indique pelo menos 1 adulto',nvErrLieu:'⚠️ Selecione partida e destino',nvErrAddrDep:'⚠️ Morada de partida obrigatória quando o lugar não está na lista',nvErrAddrDest:'⚠️ Morada de destino obrigatória quando o lugar não está na lista',nvPartida:'Ponto de Partida *',nvEndPartida:'Morada de Partida',nvDestino:'Destino *',nvEndDestino:'Morada de Destino',nvVoo:'Nº Voo',nvQuarto:'Nº Quarto',nvCom:'Comentário (opcional)',nvOAirport:'✈ Aeroporto',nvOHotel:'🏨 Hotel',nvOBus:'🚌 Autocarro',nvOTrain:'🚂 Comboio',nvOHighspeed:'🚄 Alta Velocidade',nvClear:'Limpar',nvSubmit:'Guardar',nvSubmitting:'A guardar…',nvOk:'✅ Reserva guardada — peça disponibilidade à agência por WhatsApp',nvAskWa:'Abrir WhatsApp para pedir disponibilidade?',nvErrRequired:'⚠️ Preencha os campos obrigatórios (*)',nvErrEmail:'⚠️ Email inválido',
   histTtl:'Histórico de Reservas',histRefresh:'Atualizar',histNote:'Últimas atualizações das suas reservas. Clique em «Ver histórico» para consultar todas as ações de uma reserva.',histLoading:'A carregar…',histEmpty:'Nenhuma reserva encontrada.',histLastUpd:'Última Atualização',histAction:'Ver Histórico',histModalTtl:'Histórico da Reserva',histModalLoading:'A carregar…',histModalClose:'Fechar',histModalEmpty:'Sem registos de histórico para esta reserva.',histModalErr:'Erro ao carregar histórico.',btnHist:'Histórico'},
-  EN:{loginTitle:'🔐 Hotel Portal',agId:'Hotel ID',agPass:'Password',loginBtn:'Sign In',resetLink:'Change / Reset password',r1Title:'🔑 Reset Password',r1Sub:'Enter your hotel ID and registered email',r1Id:'Hotel ID',r1Email:'Registered email address',r1Btn:'Send Code',back1:'Back to login',r2Title:'📧 Verify Code',r2Sub:'Code sent to your email',r2Code:'Verification code (6 digits)',r2New:'New password (min. 8 chars)',r2Cf:'Confirm new password',r2Btn:'Change Password',r2Hint:'The code is valid for 15 minutes',back2:'Request new code',errEmpty:'Please fill in all fields.',errConn:'Connection error.',errPwMatch:'Passwords do not match.',errPwShort:'Minimum 8 characters.',okPwChanged:'✅ Password changed successfully!',sTotal:'Total',sPend:'Pending',sConf:'Confirmed',sUpcoming:'Upcoming',cardTtl:'Assigned Bookings',expExcel:'Excel',expPdf:'PDF',refreshTxt:'Refresh',fSearch:'Search',fSearchPh:'ID, client, email, phone…',fDestPh:'Airport, hotel, Oriente…',filtActive:'Active filters',filtResults:'result(s)',fStatut:'Status',fAll:'All',fPend:'⏳ Pending',fConf:'✅ Confirmed',fCanc:'❌ Cancelled',fReal:'🏁 Completed',fDs:'Start date',fDe:'End date',fDest:'Destination',fDestAll:'All',btnFilter:'Filter',btnReset:'Clear',loading:'Loading…',logout:'⎋ Sign out',modalTtl:'Booking Details',modalActions:'⚡ Actions',mPrix:'Price (€)',mComment:'Comment (optional)',btnClose:'Close',btnCancel:'Cancel',btnConfirm:'Confirm',btnPrice:'Change Price',btnPago:'Transfer paid',lblPayment:'Payment',toastPago:'💶 Transfer marked as paid',msgPago:'💶 Transfer paid!',waTtl:'WhatsApp Confirmation → Client',waPhone:'Client WhatsApp',waBtn:'Open WhatsApp → Client',hotelWaTtl:'Confirm to Agence Ruelas — via WhatsApp',hotelWaDesc:'Send this message to Agence Ruelas to confirm the hotel accepts this transfer. The agency will register the confirmation in the system.',hotelWaBtn:'Confirm to Agency via WhatsApp',copyMsg:'Copy Message',calTtl:'Add to Calendar',colRef:'Ref.',colClient:'Client',colDate:'Date',colHour:'Time',colRoute:'Route',colPax:'Pax',colPrice:'Price',colStatus:'Status',colActs:'Actions',emptyTitle:'No bookings found',emptySub:'Try adjusting the filters.',toastConf:'✅ Confirmed successfully',toastCanc:'❌ Cancelled',toastExcel:'📊 Excel exported',toastPdf:'🖨️ PDF printed',toastWa:'💬 WhatsApp opened!',toastHotelWa:'🏨 Confirmation message sent to the agency!',toastPrice:'💶 Price updated',toastCopy:'📋 Message copied!',confirmCancel:'Cancel this booking',msgConf:'✅ Booking confirmed!',msgCanc:'❌ Booking cancelled.',msgPrice:'💶 Price updated!',pageOf:'of',lblClient:'Client',lblEmail:'Email',lblPhone:'Phone',lblOta:'OTA Ref.',lblDate:'Date / Time',lblPaxMalas:'Pax / Bags',lblOrigin:'Origin',lblAddrDep:'Departure Address',lblDest:'Destination',lblAddrDest:'Destination Address',lblFlight:'Flight N°',lblTransport:'Transport N°',lblRoom:'Room',lblPrice:'Price',lblStatus:'Status',lblComments:'Comments',tabAll:'All Bookings',tabUpcoming:'Upcoming Transfers',tabNova:'New Booking',tabHistorico:'History',upcomingTitle:'Upcoming Transfers',upcomingSub:'Future transfers not yet completed — in chronological order',upcomingEmpty:'No upcoming pending transfers.',today:'Today',tomorrow:'Tomorrow',emailPrevSec:'📧 Message preview',waPrevLang:'Message language (dropdown)',payIncl:'Include payment method in the text',payModeLbl:'Payment mode',payOff:'(hide line)',paySheet:'Agency setting (access management)',payDriver:'Cash to the driver',payRecep:'Cash at hotel reception',payCustomOpt:'Custom (free text)',payCustomLbl:'Custom text (all languages)',payCustomPh:'e.g. Payment on arrival…',
-  novaTtl:'New Booking',novaLockedTtl:'Booking creation disabled',novaLockedSub:'Contact Agence Ruelas to enable this feature for your hotel.',nvNom:'Client Name *',nvEmail:'Email *',nvTel:'Phone *',nvOta:'OTA / Booking Ref.',nvOrigem:'Transfer Origin',nvData:'Transfer Date *',nvHora:'Transfer Time *',nvAdultos:'Adults *',nvBebes:'Babies',nvCadeiraRodas:'Wheelchair',nvCadeiraBebe:'Baby car seat',nvMalasGrandes:'Large bags',nvMochilas:'Backpacks',nvPaxSummary:'Total pax: {p} · Total bags: {b}',nvErrAdultos:'⚠️ Enter at least 1 adult',nvErrLieu:'⚠️ Select pickup and destination',nvErrAddrDep:'⚠️ Pickup address required when the place is not in the list',nvErrAddrDest:'⚠️ Destination address required when the place is not in the list',nvPartida:'Pickup Point *',nvEndPartida:'Pickup Address',nvDestino:'Destination *',nvEndDestino:'Destination Address',nvVoo:'Flight N°',nvQuarto:'Room N°',nvCom:'Comment (optional)',nvOAirport:'✈ Airport',nvOHotel:'🏨 Hotel',nvOBus:'🚌 Bus',nvOTrain:'🚂 Train',nvOHighspeed:'🚄 High-Speed',nvClear:'Clear',nvSubmit:'Create Booking',nvSubmitting:'Creating…',nvOk:'✅ Booking created successfully',nvErrRequired:'⚠️ Please fill in the required fields (*)',nvErrEmail:'⚠️ Invalid email',
+  EN:{loginTitle:'🔐 Hotel Portal',agId:'Hotel ID',agPass:'Password',loginBtn:'Sign In',resetLink:'Change / Reset via registered email',r1Title:'🔑 Reset Password',r1Sub:'Enter hotel ID and the email set by the Agency on the hotel record',r1Id:'Hotel ID',r1Email:'Email on file (set by Agency)',r1Btn:'Send Code',back1:'Back to login',r2Title:'📧 Verify Code',r2Sub:'Code sent to your email',r2Code:'Verification code (6 digits)',r2New:'New password (min. 8 chars)',r2Cf:'Confirm new password',r2Btn:'Change Password',r2Hint:'The code is valid for 15 minutes',back2:'Request new code',errEmpty:'Please fill in all fields.',errConn:'Connection error.',errPwMatch:'Passwords do not match.',errPwShort:'Minimum 8 characters.',okPwChanged:'✅ Password changed successfully!',sTotal:'Total',sPend:'Pending',sConf:'Confirmed',sUpcoming:'Upcoming',cardTtl:'Assigned Bookings',expExcel:'Excel',expPdf:'PDF',expOnlyOwn:'No bookings created by this hotel to export.',expNoMatch:'No bookings in the current view created by this hotel.',refreshTxt:'Refresh',fSearch:'Search',fSearchPh:'ID, client, email, phone…',fDestPh:'Airport, hotel, Oriente…',filtActive:'Active filters',filtResults:'result(s)',fStatut:'Status',fAll:'All',fPend:'⏳ Pending',fConf:'✅ Confirmed',fCanc:'❌ Cancelled',fReal:'🏁 Completed',fDs:'Start date',fDe:'End date',fDest:'Destination',fDestAll:'All',btnFilter:'Filter',btnReset:'Clear',loading:'Loading…',logout:'⎋ Sign out',modalTtl:'Booking Details',modalActions:'⚡ Actions',mPrix:'Price (€)',mComment:'Comment (optional)',btnClose:'Close',btnCancel:'Cancel',btnConfirm:'Confirm',btnPrice:'Change Price',btnPago:'Transfer paid',lblPayment:'Payment',toastPago:'💶 Transfer marked as paid',msgPago:'💶 Transfer paid!',waTtl:'WhatsApp Confirmation → Client',waPhone:'Client WhatsApp',waBtn:'Open WhatsApp → Client',hotelWaTtl:'Request availability from Agency — WhatsApp',hotelWaDesc:'After saving, send this message to Agence Ruelas to request availability. The agency confirms, cancels or adjusts the price in the system.',hotelWaBtn:'Request availability via WhatsApp',copyMsg:'Copy Message',calTtl:'Add to Calendar',colRef:'Ref.',colClient:'Client',colDate:'Date',colHour:'Time',colRoute:'Route',colPax:'Pax',colPrice:'Price',colStatus:'Status',colActs:'Actions',emptyTitle:'No bookings found',emptySub:'Try adjusting the filters.',toastConf:'✅ Confirmed successfully',toastCanc:'❌ Cancelled',toastExcel:'📊 Excel exported',toastPdf:'🖨️ PDF printed',toastWa:'💬 WhatsApp opened!',toastHotelWa:'💬 Availability request sent to the agency!',toastPrice:'💶 Price updated',toastCopy:'📋 Message copied!',confirmCancel:'Cancel this booking',msgConf:'✅ Booking confirmed!',msgCanc:'❌ Booking cancelled.',msgPrice:'💶 Price updated!',pageOf:'of',lblClient:'Client',lblEmail:'Email',lblPhone:'Phone',lblOta:'OTA Ref.',lblDate:'Date / Time',lblPaxMalas:'Pax / Bags',lblOrigin:'Origin',lblAddrDep:'Departure Address',lblDest:'Destination',lblAddrDest:'Destination Address',lblFlight:'Flight N°',lblTransport:'Transport N°',lblRoom:'Room',lblPrice:'Price',lblStatus:'Status',lblComments:'Comments',tabAll:'All Bookings',tabUpcoming:'Upcoming Transfers',tabNova:'New Booking',tabHistorico:'History',upcomingTitle:'Upcoming Transfers',upcomingSub:'Future transfers not yet completed — in chronological order',upcomingEmpty:'No upcoming pending transfers.',today:'Today',tomorrow:'Tomorrow',emailPrevSec:'📧 Message preview',waPrevLang:'Message language (dropdown)',payIncl:'Include payment method in the text',payModeLbl:'Payment mode',payOff:'(hide line)',paySheet:'Agency setting (access management)',payDriver:'Cash to the driver',payRecep:'Cash at hotel reception',payCustomOpt:'Custom (free text)',payCustomLbl:'Custom text (all languages)',payCustomPh:'e.g. Payment on arrival…',
+  hotelEditSec:'Edit booking',heNom:'Client name',heTel:'Phone',heVol:'Flight N°',heDepart:'Pickup',heDest:'Destination',heDate:'Date',heHeure:'Time',heRoom:'Room',heCom:'Comment',btnHotelSave:'Save changes',hotelSaveOk:'✅ Changes saved',hotelSaveErr:'Error saving',hotelEditLocked:'After agency confirmation, you can only change the client name and flight number.',
+  novaTtl:'New Booking',novaLockedTtl:'Booking creation disabled',novaLockedSub:'Contact Agence Ruelas to enable this feature for your hotel.',nvNom:'Client Name *',nvEmail:'Email *',nvTel:'Phone *',nvOta:'OTA / Booking Ref.',nvOrigem:'Transfer Origin',nvData:'Transfer Date *',nvHora:'Transfer Time *',nvAdultos:'Adults *',nvBebes:'Babies',nvCadeiraRodas:'Wheelchair',nvCadeiraBebe:'Baby car seat',nvMalasGrandes:'Large bags',nvMochilas:'Backpacks',nvPaxSummary:'Total pax: {p} · Total bags: {b}',nvErrAdultos:'⚠️ Enter at least 1 adult',nvErrLieu:'⚠️ Select pickup and destination',nvErrAddrDep:'⚠️ Pickup address required when the place is not in the list',nvErrAddrDest:'⚠️ Destination address required when the place is not in the list',nvPartida:'Pickup Point *',nvEndPartida:'Pickup Address',nvDestino:'Destination *',nvEndDestino:'Destination Address',nvVoo:'Flight N°',nvQuarto:'Room N°',nvCom:'Comment (optional)',nvOAirport:'✈ Airport',nvOHotel:'🏨 Hotel',nvOBus:'🚌 Bus',nvOTrain:'🚂 Train',nvOHighspeed:'🚄 High-Speed',nvClear:'Clear',nvSubmit:'Save',nvSubmitting:'Saving…',nvOk:'✅ Booking saved — request availability from the agency via WhatsApp',nvAskWa:'Open WhatsApp to request availability?',nvErrRequired:'⚠️ Please fill in the required fields (*)',nvErrEmail:'⚠️ Invalid email',
   histTtl:'Booking History',histRefresh:'Refresh',histNote:'Latest updates on your bookings. Click "View history" to see all actions for a booking.',histLoading:'Loading…',histEmpty:'No bookings found.',histLastUpd:'Last Update',histAction:'View History',histModalTtl:'Booking History',histModalLoading:'Loading…',histModalClose:'Close',histModalEmpty:'No history records for this booking.',histModalErr:'Error loading history.',btnHist:'History'},
-  FR:{loginTitle:'🔐 Portail Hôtel',agId:'Identifiant hôtel',agPass:'Mot de passe',loginBtn:'Se connecter',resetLink:'Changer / Récupérer le mot de passe',r1Title:'🔑 Récupérer le Mot de Passe',r1Sub:"Saisissez l'identifiant de l'hôtel et l'email enregistré",r1Id:'Identifiant hôtel',r1Email:'Email enregistré sur le compte',r1Btn:'Envoyer le Code',back1:'Retour au login',r2Title:'📧 Vérifier le Code',r2Sub:'Code envoyé à votre email',r2Code:'Code de vérification (6 chiffres)',r2New:'Nouveau mot de passe (min. 8 car.)',r2Cf:'Confirmer le nouveau mot de passe',r2Btn:'Changer le Mot de Passe',r2Hint:'Le code est valide pendant 15 minutes',back2:'Demander un nouveau code',errEmpty:'Veuillez remplir tous les champs.',errConn:'Erreur de connexion.',errPwMatch:'Les mots de passe ne correspondent pas.',errPwShort:'Minimum 8 caractères.',okPwChanged:'✅ Mot de passe changé avec succès !',sTotal:'Total',sPend:'En attente',sConf:'Confirmées',sUpcoming:'À réaliser',cardTtl:'Réservations Attribuées',expExcel:'Excel',expPdf:'PDF',refreshTxt:'Actualiser',fSearch:'Recherche',fSearchPh:'ID, client, e-mail, téléphone…',fDestPh:'Aéroport, hôtel, Oriente…',filtActive:'Filtres actifs',filtResults:'résultat(s)',fStatut:'Statut',fAll:'Tous',fPend:'⏳ En attente',fConf:'✅ Confirmée',fCanc:'❌ Annulée',fReal:'🏁 Réalisée',fDs:'Date début',fDe:'Date fin',fDest:'Destination',fDestAll:'Tous',btnFilter:'Filtrer',btnReset:'Effacer',loading:'Chargement…',logout:'⎋ Déconnexion',modalTtl:'Détails de la Réservation',modalActions:'⚡ Actions',mPrix:'Prix (€)',mComment:'Commentaire (optionnel)',btnClose:'Fermer',btnCancel:'Annuler',btnConfirm:'Confirmer',btnPrice:'Modifier le Prix',btnPago:'Transfer payé',lblPayment:'Paiement',toastPago:'💶 Transfer marqué comme payé',msgPago:'💶 Transfer payé !',waTtl:'Confirmation WhatsApp → Client',waPhone:'WhatsApp client',waBtn:'Ouvrir WhatsApp → Client',hotelWaTtl:"Confirmer à Agence Ruelas — via WhatsApp",hotelWaDesc:"Envoyez ce message à l'Agence Ruelas pour confirmer que l'hôtel accepte ce transfert. L'agence enregistrera la confirmation dans le système.",hotelWaBtn:"Confirmer à l'Agence via WhatsApp",copyMsg:'Copier le Message',calTtl:'Ajouter au Calendrier',colRef:'Réf.',colClient:'Client',colDate:'Date',colHour:'Heure',colRoute:'Trajet',colPax:'Pax',colPrice:'Prix',colStatus:'Statut',colActs:'Actions',emptyTitle:'Aucune réservation trouvée',emptySub:"Essayez d'ajuster les filtres.",toastConf:'✅ Confirmée avec succès',toastCanc:'❌ Annulée',toastExcel:'📊 Excel exporté',toastPdf:'🖨️ PDF imprimé',toastWa:'💬 WhatsApp ouvert !',toastHotelWa:"🏨 Message de confirmation envoyé à l'agence !",toastPrice:'💶 Prix mis à jour',toastCopy:'📋 Message copié !',confirmCancel:'Annuler cette réservation',msgConf:'✅ Réservation confirmée !',msgCanc:'❌ Réservation annulée.',msgPrice:'💶 Prix mis à jour !',pageOf:'sur',lblClient:'Client',lblEmail:'Email',lblPhone:'Téléphone',lblOta:'Réf. OTA',lblDate:'Date / Heure',lblPaxMalas:'Pax / Bagages',lblOrigin:'Départ',lblAddrDep:'Adresse départ',lblDest:'Destination',lblAddrDest:'Adresse destination',lblFlight:'N° Vol',lblTransport:'N° Transport',lblRoom:'Chambre',lblPrice:'Prix',lblStatus:'Statut',lblComments:'Commentaires',tabAll:'Toutes les Réservations',tabUpcoming:'Prochains Transferts',tabNova:'Nouvelle Réservation',tabHistorico:'Historique',upcomingTitle:'Prochains Transferts',upcomingSub:'Transferts futurs non encore réalisés — par ordre chronologique',upcomingEmpty:'Aucun transfert futur en attente.',today:"Aujourd'hui",tomorrow:'Demain',emailPrevSec:'📧 Aperçu du texte envoyé',waPrevLang:'Langue du message (liste)',payIncl:'Inclure le mode de paiement dans le texte',payModeLbl:'Mode de paiement',payOff:'(ne pas afficher)',paySheet:'Paramètre agence (gestion des accès)',payDriver:'Espèces au chauffeur',payRecep:'Espèces à la réception',payCustomOpt:'Personnalisé (texte libre)',payCustomLbl:'Texte personnalisé (toutes langues)',payCustomPh:'Ex. : Paiement sur place…',
-  novaTtl:'Nouvelle Réservation',novaLockedTtl:'Création de réservations désactivée',novaLockedSub:"Contactez l'Agence Ruelas pour activer cette fonctionnalité pour votre hôtel.",nvNom:'Nom du Client *',nvEmail:'Email *',nvTel:'Téléphone *',nvOta:'Réf. OTA / Réservation',nvOrigem:'Origine du Transfert',nvData:'Date du Transfert *',nvHora:'Heure du Transfert *',nvAdultos:'Adultes *',nvBebes:'Bébés',nvCadeiraRodas:'Fauteuil roulant',nvCadeiraBebe:'Siège auto bébé',nvMalasGrandes:'Grandes valises',nvMochilas:'Sacs à dos',nvPaxSummary:'Total pax: {p} · Total bagages: {b}',nvErrAdultos:'⚠️ Indiquez au moins 1 adulte',nvErrLieu:'⚠️ Sélectionnez départ et destination',nvErrAddrDep:'⚠️ Adresse de départ obligatoire si le lieu n\'est pas dans la liste',nvErrAddrDest:'⚠️ Adresse de destination obligatoire si le lieu n\'est pas dans la liste',nvPartida:'Point de Départ *',nvEndPartida:'Adresse de Départ',nvDestino:'Destination *',nvEndDestino:'Adresse de Destination',nvVoo:'N° Vol',nvQuarto:'N° Chambre',nvCom:'Commentaire (optionnel)',nvOAirport:'✈ Aéroport',nvOHotel:'🏨 Hôtel',nvOBus:'🚌 Autocar',nvOTrain:'🚂 Train',nvOHighspeed:'🚄 Grande Vitesse',nvClear:'Effacer',nvSubmit:'Créer la Réservation',nvSubmitting:'Création…',nvOk:'✅ Réservation créée avec succès',nvErrRequired:'⚠️ Veuillez remplir les champs obligatoires (*)',nvErrEmail:'⚠️ Email invalide',
+  FR:{loginTitle:'🔐 Portail Hôtel',agId:'Identifiant hôtel',agPass:'Mot de passe',loginBtn:'Se connecter',resetLink:'Changer / Récupérer via email de la fiche',r1Title:'🔑 Récupérer le Mot de Passe',r1Sub:"Saisissez l'ID hôtel et l'email défini par l'Agence sur la fiche",r1Id:'Identifiant hôtel',r1Email:'Email de la fiche (défini par l\'Agence)',r1Btn:'Envoyer le Code',back1:'Retour au login',r2Title:'📧 Vérifier le Code',r2Sub:'Code envoyé à votre email',r2Code:'Code de vérification (6 chiffres)',r2New:'Nouveau mot de passe (min. 8 car.)',r2Cf:'Confirmer le nouveau mot de passe',r2Btn:'Changer le Mot de Passe',r2Hint:'Le code est valide pendant 15 minutes',back2:'Demander un nouveau code',errEmpty:'Veuillez remplir tous les champs.',errConn:'Erreur de connexion.',errPwMatch:'Les mots de passe ne correspondent pas.',errPwShort:'Minimum 8 caractères.',okPwChanged:'✅ Mot de passe changé avec succès !',sTotal:'Total',sPend:'En attente',sConf:'Confirmées',sUpcoming:'À réaliser',cardTtl:'Réservations Attribuées',expExcel:'Excel',expPdf:'PDF',expOnlyOwn:'Aucune réservation créée par cet hôtel à exporter.',expNoMatch:'Aucune réservation de la vue actuelle créée par cet hôtel.',refreshTxt:'Actualiser',fSearch:'Recherche',fSearchPh:'ID, client, e-mail, téléphone…',fDestPh:'Aéroport, hôtel, Oriente…',filtActive:'Filtres actifs',filtResults:'résultat(s)',fStatut:'Statut',fAll:'Tous',fPend:'⏳ En attente',fConf:'✅ Confirmée',fCanc:'❌ Annulée',fReal:'🏁 Réalisée',fDs:'Date début',fDe:'Date fin',fDest:'Destination',fDestAll:'Tous',btnFilter:'Filtrer',btnReset:'Effacer',loading:'Chargement…',logout:'⎋ Déconnexion',modalTtl:'Détails de la Réservation',modalActions:'⚡ Actions',mPrix:'Prix (€)',mComment:'Commentaire (optionnel)',btnClose:'Fermer',btnCancel:'Annuler',btnConfirm:'Confirmer',btnPrice:'Modifier le Prix',btnPago:'Transfer payé',lblPayment:'Paiement',toastPago:'💶 Transfer marqué comme payé',msgPago:'💶 Transfer payé !',waTtl:'Confirmation WhatsApp → Client',waPhone:'WhatsApp client',waBtn:'Ouvrir WhatsApp → Client',hotelWaTtl:"Demande de disponibilité à l'Agence — WhatsApp",hotelWaDesc:"Après enregistrement, envoyez ce message à l'Agence Ruelas pour demander la disponibilité. L'agence confirme, annule ou ajuste le prix dans le système.",hotelWaBtn:'Demander disponibilité via WhatsApp',copyMsg:'Copier le Message',calTtl:'Ajouter au Calendrier',colRef:'Réf.',colClient:'Client',colDate:'Date',colHour:'Heure',colRoute:'Trajet',colPax:'Pax',colPrice:'Prix',colStatus:'Statut',colActs:'Actions',emptyTitle:'Aucune réservation trouvée',emptySub:"Essayez d'ajuster les filtres.",toastConf:'✅ Confirmée avec succès',toastCanc:'❌ Annulée',toastExcel:'📊 Excel exporté',toastPdf:'🖨️ PDF imprimé',toastWa:'💬 WhatsApp ouvert !',toastHotelWa:"💬 Demande de disponibilité envoyée à l'agence !",toastPrice:'💶 Prix mis à jour',toastCopy:'📋 Message copié !',confirmCancel:'Annuler cette réservation',msgConf:'✅ Réservation confirmée !',msgCanc:'❌ Réservation annulée.',msgPrice:'💶 Prix mis à jour !',pageOf:'sur',lblClient:'Client',lblEmail:'Email',lblPhone:'Téléphone',lblOta:'Réf. OTA',lblDate:'Date / Heure',lblPaxMalas:'Pax / Bagages',lblOrigin:'Départ',lblAddrDep:'Adresse départ',lblDest:'Destination',lblAddrDest:'Adresse destination',lblFlight:'N° Vol',lblTransport:'N° Transport',lblRoom:'Chambre',lblPrice:'Prix',lblStatus:'Statut',lblComments:'Commentaires',tabAll:'Toutes les Réservations',tabUpcoming:'Prochains Transferts',tabNova:'Nouvelle Réservation',tabHistorico:'Historique',upcomingTitle:'Prochains Transferts',upcomingSub:'Transferts futurs non encore réalisés — par ordre chronologique',upcomingEmpty:'Aucun transfert futur en attente.',today:"Aujourd'hui",tomorrow:'Demain',emailPrevSec:'📧 Aperçu du texte envoyé',waPrevLang:'Langue du message (liste)',payIncl:'Inclure le mode de paiement dans le texte',payModeLbl:'Mode de paiement',payOff:'(ne pas afficher)',paySheet:'Paramètre agence (gestion des accès)',payDriver:'Espèces au chauffeur',payRecep:'Espèces à la réception',payCustomOpt:'Personnalisé (texte libre)',payCustomLbl:'Texte personnalisé (toutes langues)',payCustomPh:'Ex. : Paiement sur place…',
+  hotelEditSec:'Modifier la réservation',heNom:'Nom du client',heTel:'Téléphone',heVol:'N° Vol',heDepart:'Départ',heDest:'Destination',heDate:'Date',heHeure:'Heure',heRoom:'Chambre',heCom:'Commentaire',btnHotelSave:'Enregistrer les modifications',hotelSaveOk:'✅ Modifications enregistrées',hotelSaveErr:"Erreur d'enregistrement",hotelEditLocked:"Après confirmation par l'agence, vous ne pouvez modifier que le nom du client et le n° de vol.",
+  novaTtl:'Nouvelle Réservation',novaLockedTtl:'Création de réservations désactivée',novaLockedSub:"Contactez l'Agence Ruelas pour activer cette fonctionnalité pour votre hôtel.",nvNom:'Nom du Client *',nvEmail:'Email *',nvTel:'Téléphone *',nvOta:'Réf. OTA / Réservation',nvOrigem:'Origine du Transfert',nvData:'Date du Transfert *',nvHora:'Heure du Transfert *',nvAdultos:'Adultes *',nvBebes:'Bébés',nvCadeiraRodas:'Fauteuil roulant',nvCadeiraBebe:'Siège auto bébé',nvMalasGrandes:'Grandes valises',nvMochilas:'Sacs à dos',nvPaxSummary:'Total pax: {p} · Total bagages: {b}',nvErrAdultos:'⚠️ Indiquez au moins 1 adulte',nvErrLieu:'⚠️ Sélectionnez départ et destination',nvErrAddrDep:'⚠️ Adresse de départ obligatoire si le lieu n\'est pas dans la liste',nvErrAddrDest:'⚠️ Adresse de destination obligatoire si le lieu n\'est pas dans la liste',nvPartida:'Point de Départ *',nvEndPartida:'Adresse de Départ',nvDestino:'Destination *',nvEndDestino:'Adresse de Destination',nvVoo:'N° Vol',nvQuarto:'N° Chambre',nvCom:'Commentaire (optionnel)',nvOAirport:'✈ Aéroport',nvOHotel:'🏨 Hôtel',nvOBus:'🚌 Autocar',nvOTrain:'🚂 Train',nvOHighspeed:'🚄 Grande Vitesse',nvClear:'Effacer',nvSubmit:'Enregistrer',nvSubmitting:'Enregistrement…',nvOk:"✅ Réservation enregistrée — demandez la disponibilité à l'agence par WhatsApp",nvAskWa:'Ouvrir WhatsApp pour demander la disponibilité ?',nvErrRequired:'⚠️ Veuillez remplir les champs obligatoires (*)',nvErrEmail:'⚠️ Email invalide',
   histTtl:'Historique des Réservations',histRefresh:'Actualiser',histNote:'Dernières mises à jour de vos réservations. Cliquez sur « Voir historique » pour consulter toutes les actions d\'une réservation.',histLoading:'Chargement…',histEmpty:'Aucune réservation trouvée.',histLastUpd:'Dernière Mise à Jour',histAction:'Voir Historique',histModalTtl:'Historique de la Réservation',histModalLoading:'Chargement…',histModalClose:'Fermer',histModalEmpty:'Aucun historique pour cette réservation.',histModalErr:'Erreur de chargement de l\'historique.',btnHist:'Historique'},
-  ES:{loginTitle:'🔐 Portal Hotel',agId:'Identificador del Hotel',agPass:'Contraseña',loginBtn:'Entrar',resetLink:'Cambiar / Recuperar contraseña',r1Title:'🔑 Recuperar Contraseña',r1Sub:'Introduzca el identificador del hotel y el email registrado',r1Id:'Identificador del Hotel',r1Email:'Email registrado en la cuenta',r1Btn:'Enviar Código',back1:'Volver al acceso',r2Title:'📧 Verificar Código',r2Sub:'Código enviado a su email',r2Code:'Código de verificación (6 dígitos)',r2New:'Nueva contraseña (mín. 8 car.)',r2Cf:'Confirmar nueva contraseña',r2Btn:'Cambiar Contraseña',r2Hint:'El código es válido durante 15 minutos',back2:'Pedir nuevo código',errEmpty:'Por favor rellene todos los campos.',errConn:'Error de conexión.',errPwMatch:'Las contraseñas no coinciden.',errPwShort:'Mínimo 8 caracteres.',okPwChanged:'✅ ¡Contraseña cambiada con éxito!',sTotal:'Total',sPend:'Pendientes',sConf:'Confirmadas',sUpcoming:'A Realizar',cardTtl:'Reservas Asignadas',expExcel:'Excel',expPdf:'PDF',refreshTxt:'Actualizar',fSearch:'Búsqueda',fSearchPh:'ID, cliente, email, teléfono…',fDestPh:'Aeropuerto, hotel, Oriente…',filtActive:'Filtros activos',filtResults:'resultado(s)',fStatut:'Estado',fAll:'Todos',fPend:'⏳ Pendiente',fConf:'✅ Confirmada',fCanc:'❌ Cancelada',fReal:'🏁 Realizada',fDs:'Fecha inicio',fDe:'Fecha fin',fDest:'Destino',fDestAll:'Todos',btnFilter:'Filtrar',btnReset:'Borrar',loading:'Cargando…',logout:'⎋ Salir',modalTtl:'Detalles de la Reserva',modalActions:'⚡ Acciones',mPrix:'Precio (€)',mComment:'Comentario (opcional)',btnClose:'Cerrar',btnCancel:'Cancelar',btnConfirm:'Confirmar',btnPrice:'Cambiar Precio',btnPago:'Transfer pagado',lblPayment:'Pago',toastPago:'💶 Transfer marcado como pagado',msgPago:'💶 ¡Transfer pagado!',waTtl:'Confirmación WhatsApp → Cliente',waPhone:'WhatsApp cliente',waBtn:'Abrir WhatsApp → Cliente',hotelWaTtl:'Confirmar a Agence Ruelas — via WhatsApp',hotelWaDesc:'Envíe este mensaje a la Agencia Ruelas para confirmar que el hotel acepta este traslado. La agencia registrará la confirmación en el sistema.',hotelWaBtn:'Confirmar a la Agencia via WhatsApp',copyMsg:'Copiar Mensaje',calTtl:'Agregar al Calendario',colRef:'Ref.',colClient:'Cliente',colDate:'Fecha',colHour:'Hora',colRoute:'Ruta',colPax:'Pax',colPrice:'Precio',colStatus:'Estado',colActs:'Acciones',emptyTitle:'No se encontraron reservas',emptySub:'Intente ajustar los filtros.',toastConf:'✅ Confirmada con éxito',toastCanc:'❌ Cancelada',toastExcel:'📊 Excel exportado',toastPdf:'🖨️ PDF impreso',toastWa:'💬 ¡WhatsApp abierto!',toastHotelWa:'🏨 ¡Mensaje de confirmación enviado a la agencia!',toastPrice:'💶 Precio actualizado',toastCopy:'📋 ¡Mensaje copiado!',confirmCancel:'Cancelar esta reserva',msgConf:'✅ ¡Reserva confirmada!',msgCanc:'❌ Reserva cancelada.',msgPrice:'💶 ¡Precio actualizado!',pageOf:'de',lblClient:'Cliente',lblEmail:'Email',lblPhone:'Teléfono',lblOta:'Ref. OTA',lblDate:'Fecha / Hora',lblPaxMalas:'Pax / Maletas',lblOrigin:'Salida',lblAddrDep:'Dirección salida',lblDest:'Destino',lblAddrDest:'Dirección destino',lblFlight:'N° Vuelo',lblTransport:'N° Transporte',lblRoom:'Habitación',lblPrice:'Precio',lblStatus:'Estado',lblComments:'Comentarios',tabAll:'Todas las Reservas',tabUpcoming:'Próximas Transferencias',tabNova:'Nueva Reserva',tabHistorico:'Historial',upcomingTitle:'Próximas Transferencias',upcomingSub:'Transferencias futuras no realizadas — en orden cronológico',upcomingEmpty:'No hay transferencias futuras pendientes.',today:'Hoy',tomorrow:'Mañana',emailPrevSec:'📧 Vista previa del texto enviado',waPrevLang:'Idioma del mensaje (lista)',payIncl:'Incluir modo de pago en el texto',payModeLbl:'Modo de pago',payOff:'(no mostrar)',paySheet:'Definición de la agencia (gestión de accesos)',payDriver:'Efectivo al conductor',payRecep:'Efectivo en recepción del hotel',payCustomOpt:'Personalizado (texto libre)',payCustomLbl:'Texto personalizado (todas las lenguas)',payCustomPh:'Ej.: Pago en destino…',
-  novaTtl:'Nueva Reserva',novaLockedTtl:'Creación de reservas desactivada',novaLockedSub:'Contacte a la Agencia Ruelas para activar esta función para su hotel.',nvNom:'Nombre del Cliente *',nvEmail:'Email *',nvTel:'Teléfono *',nvOta:'Ref. OTA / Reserva',nvOrigem:'Origen del Traslado',nvData:'Fecha del Traslado *',nvHora:'Hora del Traslado *',nvAdultos:'Adultos *',nvBebes:'Bebés',nvCadeiraRodas:'Silla de ruedas',nvCadeiraBebe:'Silla auto bebé',nvMalasGrandes:'Maletas grandes',nvMochilas:'Mochilas',nvPaxSummary:'Total pax: {p} · Total equipaje: {b}',nvErrAdultos:'⚠️ Indique al menos 1 adulto',nvErrLieu:'⚠️ Seleccione salida y destino',nvErrAddrDep:'⚠️ Dirección de salida obligatoria cuando el lugar no está en la lista',nvErrAddrDest:'⚠️ Dirección de destino obligatoria cuando el lugar no está en la lista',nvPartida:'Punto de Salida *',nvEndPartida:'Dirección de Salida',nvDestino:'Destino *',nvEndDestino:'Dirección de Destino',nvVoo:'Nº Vuelo',nvQuarto:'Nº Habitación',nvCom:'Comentario (opcional)',nvOAirport:'✈ Aeropuerto',nvOHotel:'🏨 Hotel',nvOBus:'🚌 Autobús',nvOTrain:'🚂 Tren',nvOHighspeed:'🚄 Alta Velocidad',nvClear:'Borrar',nvSubmit:'Crear Reserva',nvSubmitting:'Creando…',nvOk:'✅ Reserva creada con éxito',nvErrRequired:'⚠️ Rellene los campos obligatorios (*)',nvErrEmail:'⚠️ Email inválido',
+  ES:{loginTitle:'🔐 Portal Hotel',agId:'Identificador del Hotel',agPass:'Contraseña',loginBtn:'Entrar',resetLink:'Cambiar / Recuperar vía email de la ficha',r1Title:'🔑 Recuperar Contraseña',r1Sub:'Introduzca el ID del hotel y el email definido por la Agencia',r1Id:'Identificador del Hotel',r1Email:'Email de la ficha (definido por la Agencia)',r1Btn:'Enviar Código',back1:'Volver al acceso',r2Title:'📧 Verificar Código',r2Sub:'Código enviado a su email',r2Code:'Código de verificación (6 dígitos)',r2New:'Nueva contraseña (mín. 8 car.)',r2Cf:'Confirmar nueva contraseña',r2Btn:'Cambiar Contraseña',r2Hint:'El código es válido durante 15 minutos',back2:'Pedir nuevo código',errEmpty:'Por favor rellene todos los campos.',errConn:'Error de conexión.',errPwMatch:'Las contraseñas no coinciden.',errPwShort:'Mínimo 8 caracteres.',okPwChanged:'✅ ¡Contraseña cambiada con éxito!',sTotal:'Total',sPend:'Pendientes',sConf:'Confirmadas',sUpcoming:'A Realizar',cardTtl:'Reservas Asignadas',expExcel:'Excel',expPdf:'PDF',expOnlyOwn:'Sin reservas creadas por este hotel para exportar.',expNoMatch:'Ninguna reserva de la vista actual creada por este hotel.',refreshTxt:'Actualizar',fSearch:'Búsqueda',fSearchPh:'ID, cliente, email, teléfono…',fDestPh:'Aeropuerto, hotel, Oriente…',filtActive:'Filtros activos',filtResults:'resultado(s)',fStatut:'Estado',fAll:'Todos',fPend:'⏳ Pendiente',fConf:'✅ Confirmada',fCanc:'❌ Cancelada',fReal:'🏁 Realizada',fDs:'Fecha inicio',fDe:'Fecha fin',fDest:'Destino',fDestAll:'Todos',btnFilter:'Filtrar',btnReset:'Borrar',loading:'Cargando…',logout:'⎋ Salir',modalTtl:'Detalles de la Reserva',modalActions:'⚡ Acciones',mPrix:'Precio (€)',mComment:'Comentario (opcional)',btnClose:'Cerrar',btnCancel:'Cancelar',btnConfirm:'Confirmar',btnPrice:'Cambiar Precio',btnPago:'Transfer pagado',lblPayment:'Pago',toastPago:'💶 Transfer marcado como pagado',msgPago:'💶 ¡Transfer pagado!',waTtl:'Confirmación WhatsApp → Cliente',waPhone:'WhatsApp cliente',waBtn:'Abrir WhatsApp → Cliente',hotelWaTtl:'Solicitar disponibilidad a la Agencia — WhatsApp',hotelWaDesc:'Tras guardar, envíe este mensaje a Agence Ruelas para solicitar disponibilidad. La agencia confirma, cancela o ajusta el precio en el sistema.',hotelWaBtn:'Solicitar disponibilidad via WhatsApp',copyMsg:'Copiar Mensaje',calTtl:'Agregar al Calendario',colRef:'Ref.',colClient:'Cliente',colDate:'Fecha',colHour:'Hora',colRoute:'Ruta',colPax:'Pax',colPrice:'Precio',colStatus:'Estado',colActs:'Acciones',emptyTitle:'No se encontraron reservas',emptySub:'Intente ajustar los filtros.',toastConf:'✅ Confirmada con éxito',toastCanc:'❌ Cancelada',toastExcel:'📊 Excel exportado',toastPdf:'🖨️ PDF impreso',toastWa:'💬 ¡WhatsApp abierto!',toastHotelWa:'💬 ¡Solicitud de disponibilidad enviada a la agencia!',toastPrice:'💶 Precio actualizado',toastCopy:'📋 ¡Mensaje copiado!',confirmCancel:'Cancelar esta reserva',msgConf:'✅ ¡Reserva confirmada!',msgCanc:'❌ Reserva cancelada.',msgPrice:'💶 ¡Precio actualizado!',pageOf:'de',lblClient:'Cliente',lblEmail:'Email',lblPhone:'Teléfono',lblOta:'Ref. OTA',lblDate:'Fecha / Hora',lblPaxMalas:'Pax / Maletas',lblOrigin:'Salida',lblAddrDep:'Dirección salida',lblDest:'Destino',lblAddrDest:'Dirección destino',lblFlight:'N° Vuelo',lblTransport:'N° Transporte',lblRoom:'Habitación',lblPrice:'Precio',lblStatus:'Estado',lblComments:'Comentarios',tabAll:'Todas las Reservas',tabUpcoming:'Próximas Transferencias',tabNova:'Nueva Reserva',tabHistorico:'Historial',upcomingTitle:'Próximas Transferencias',upcomingSub:'Transferencias futuras no realizadas — en orden cronológico',upcomingEmpty:'No hay transferencias futuras pendientes.',today:'Hoy',tomorrow:'Mañana',emailPrevSec:'📧 Vista previa del texto enviado',waPrevLang:'Idioma del mensaje (lista)',payIncl:'Incluir modo de pago en el texto',payModeLbl:'Modo de pago',payOff:'(no mostrar)',paySheet:'Definición de la agencia (gestión de accesos)',payDriver:'Efectivo al conductor',payRecep:'Efectivo en recepción del hotel',payCustomOpt:'Personalizado (texto libre)',payCustomLbl:'Texto personalizado (todas las lenguas)',payCustomPh:'Ej.: Pago en destino…',
+  hotelEditSec:'Editar reserva',heNom:'Nombre del cliente',heTel:'Teléfono',heVol:'Nº Vuelo',heDepart:'Salida',heDest:'Destino',heDate:'Fecha',heHeure:'Hora',heRoom:'Habitación',heCom:'Comentario',btnHotelSave:'Guardar cambios',hotelSaveOk:'✅ Cambios guardados',hotelSaveErr:'Error al guardar',hotelEditLocked:'Tras la confirmación de la agencia, solo puede cambiar el nombre del cliente y el nº de vuelo.',
+  novaTtl:'Nueva Reserva',novaLockedTtl:'Creación de reservas desactivada',novaLockedSub:'Contacte a la Agencia Ruelas para activar esta función para su hotel.',nvNom:'Nombre del Cliente *',nvEmail:'Email *',nvTel:'Teléfono *',nvOta:'Ref. OTA / Reserva',nvOrigem:'Origen del Traslado',nvData:'Fecha del Traslado *',nvHora:'Hora del Traslado *',nvAdultos:'Adultos *',nvBebes:'Bebés',nvCadeiraRodas:'Silla de ruedas',nvCadeiraBebe:'Silla auto bebé',nvMalasGrandes:'Maletas grandes',nvMochilas:'Mochilas',nvPaxSummary:'Total pax: {p} · Total equipaje: {b}',nvErrAdultos:'⚠️ Indique al menos 1 adulto',nvErrLieu:'⚠️ Seleccione salida y destino',nvErrAddrDep:'⚠️ Dirección de salida obligatoria cuando el lugar no está en la lista',nvErrAddrDest:'⚠️ Dirección de destino obligatoria cuando el lugar no está en la lista',nvPartida:'Punto de Salida *',nvEndPartida:'Dirección de Salida',nvDestino:'Destino *',nvEndDestino:'Dirección de Destino',nvVoo:'Nº Vuelo',nvQuarto:'Nº Habitación',nvCom:'Comentario (opcional)',nvOAirport:'✈ Aeropuerto',nvOHotel:'🏨 Hotel',nvOBus:'🚌 Autobús',nvOTrain:'🚂 Tren',nvOHighspeed:'🚄 Alta Velocidad',nvClear:'Borrar',nvSubmit:'Guardar',nvSubmitting:'Guardando…',nvOk:'✅ Reserva guardada — solicite disponibilidad a la agencia por WhatsApp',nvAskWa:'¿Abrir WhatsApp para solicitar disponibilidad?',nvErrRequired:'⚠️ Rellene los campos obligatorios (*)',nvErrEmail:'⚠️ Email inválido',
   histTtl:'Historial de Reservas',histRefresh:'Actualizar',histNote:'Últimas actualizaciones de sus reservas. Haga clic en «Ver historial» para consultar todas las acciones de una reserva.',histLoading:'Cargando…',histEmpty:'No se encontraron reservas.',histLastUpd:'Última Actualización',histAction:'Ver Historial',histModalTtl:'Historial de la Reserva',histModalLoading:'Cargando…',histModalClose:'Cerrar',histModalEmpty:'Sin registros de historial para esta reserva.',histModalErr:'Error al cargar el historial.',btnHist:'Historial'}
 };
 
@@ -1313,17 +1335,14 @@ const UI = {
 })();
 
 // ═══════════════════════════════════════════════════════════════════
-// TEMPLATES WHATSAPP — CLIENT (demande de confirmation au client)
+// TEMPLATES WHATSAPP — HÔTEL → AGENCE (demande de disponibilité)
+// Pas de WhatsApp client dans l'app : l'hôtel contacte ses clients hors app.
 // ═══════════════════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════════════
-// TEMPLATES WHATSAPP — HÔTEL (confirmation de l'agence vers l'hôtel)
-// ═══════════════════════════════════════════════════════════════════
-/* Sans emojis (compatibilité WhatsApp, évite les caractères �) */
 const WA_HOTEL = {
-  PT:(r,ag)=>{const det=formatPaxDetailPlain_(r);return `*CONFIRMAÇÃO DO HOTEL*\n\nConfirmamos a nossa disponibilidade para o seguinte transfer:\n\n- Ref.: *${r.id}*\n- Cliente: ${r.clientNom||'—'}\n- Telemóvel cliente: ${r.telephone||r.clientTel||'—'}\n- Data: *${fmtD(r.dateTransfer)} às ${r.heureTransfer}*\n- Partida: ${r.pointDepart||'—'}${r.adresseDepart?' ('+r.adresseDepart+')':''}\n- Destino: ${r.destination||'—'}${r.adresseDestination?' ('+r.adresseDestination+')':''}\n- ${r.personnes||'—'} pax · ${r.malas||'0'} malas${det?'\n- '+det:''}${r.numVol?'\n- Voo: '+r.numVol:''}${r.numTransport?'\n- Transporte: '+r.numTransport:''}\n- Preço acordado: *${r.prixFinal?r.prixFinal+' €':'A confirmar'}*\n\n- Hotel: *${ag||'—'}*\n\nPor favor confirme o registo no sistema. Obrigado!`;},
-  EN:(r,ag)=>{const det=formatPaxDetailPlain_(r);return `*HOTEL CONFIRMATION*\n\nWe confirm our availability for the following transfer:\n\n- Ref.: *${r.id}*\n- Client: ${r.clientNom||'—'}\n- Client phone: ${r.telephone||r.clientTel||'—'}\n- Date: *${fmtD(r.dateTransfer)} at ${r.heureTransfer}*\n- From: ${r.pointDepart||'—'}${r.adresseDepart?' ('+r.adresseDepart+')':''}\n- To: ${r.destination||'—'}${r.adresseDestination?' ('+r.adresseDestination+')':''}\n- ${r.personnes||'—'} pax · ${r.malas||'0'} bags${det?'\n- '+det:''}${r.numVol?'\n- Flight: '+r.numVol:''}${r.numTransport?'\n- Transport: '+r.numTransport:''}\n- Agreed price: *${r.prixFinal?r.prixFinal+' €':'To confirm'}*\n\n- Hotel: *${ag||'—'}*\n\nPlease confirm registration in the system. Thank you!`;},
-  FR:(r,ag)=>{const det=formatPaxDetailPlain_(r);return `*CONFIRMATION D'HÔTEL*\n\nNous confirmons notre disponibilité pour le transfert suivant :\n\n- Réf. : *${r.id}*\n- Client : ${r.clientNom||'—'}\n- Téléphone client : ${r.telephone||r.clientTel||'—'}\n- Date : *${fmtD(r.dateTransfer)} à ${r.heureTransfer}*\n- Départ : ${r.pointDepart||'—'}${r.adresseDepart?' ('+r.adresseDepart+')':''}\n- Destination : ${r.destination||'—'}${r.adresseDestination?' ('+r.adresseDestination+')':''}\n- ${r.personnes||'—'} pax · ${r.malas||'0'} bagages${det?'\n- '+det:''}${r.numVol?'\n- Vol : '+r.numVol:''}${r.numTransport?'\n- Transport : '+r.numTransport:''}\n- Prix convenu : *${r.prixFinal?r.prixFinal+' €':'À confirmer'}*\n\n- Hôtel : *${ag||'—'}*\n\nMerci de confirmer l'enregistrement dans le système. Merci !`;},
-  ES:(r,ag)=>{const det=formatPaxDetailPlain_(r);return `*CONFIRMACIÓN DE HOTEL*\n\nConfirmamos nuestra disponibilidad para el siguiente traslado:\n\n- Ref.: *${r.id}*\n- Cliente: ${r.clientNom||'—'}\n- Teléfono cliente: ${r.telephone||r.clientTel||'—'}\n- Fecha: *${fmtD(r.dateTransfer)} a las ${r.heureTransfer}*\n- Salida: ${r.pointDepart||'—'}${r.adresseDepart?' ('+r.adresseDepart+')':''}\n- Destino: ${r.destination||'—'}${r.adresseDestination?' ('+r.adresseDestination+')':''}\n- ${r.personnes||'—'} pax · ${r.malas||'0'} maletas${det?'\n- '+det:''}${r.numVol?'\n- Vuelo: '+r.numVol:''}${r.numTransport?'\n- Transporte: '+r.numTransport:''}\n- Precio acordado: *${r.prixFinal?r.prixFinal+' €':'A confirmar'}*\n\n- Hotel: *${ag||'—'}*\n\nPor favor confirme el registro en el sistema. Gracias.`;}
+  PT:(r,ag)=>{const det=formatPaxDetailPlain_(r);return `*PEDIDO DE DISPONIBILIDADE — HOTEL*\n\nOlá Agência Ruelas,\nPedimos disponibilidade para o seguinte transfer:\n\n- Ref.: *${r.id}*\n- Cliente: ${r.clientNom||'—'}\n- Telemóvel cliente: ${r.telephone||r.clientTel||'—'}\n- Data: *${fmtD(r.dateTransfer)} às ${r.heureTransfer}*\n- Partida: ${r.pointDepart||'—'}${r.adresseDepart?' ('+r.adresseDepart+')':''}\n- Destino: ${r.destination||'—'}${r.adresseDestination?' ('+r.adresseDestination+')':''}\n- ${r.personnes||'—'} pax · ${r.malas||'0'} malas${det?'\n- '+det:''}${r.numVol?'\n- Voo: '+r.numVol:''}${r.numTransport?'\n- Transporte: '+r.numTransport:''}\n- Preço proposto: *${r.prixFinal?r.prixFinal+' €':'A confirmar'}*\n\n- Hotel: *${ag||'—'}*\n\nPor favor confirmem, cancelem ou ajustem o preço no sistema. Obrigado!`;},
+  EN:(r,ag)=>{const det=formatPaxDetailPlain_(r);return `*AVAILABILITY REQUEST — HOTEL*\n\nHello Agence Ruelas,\nWe request availability for the following transfer:\n\n- Ref.: *${r.id}*\n- Client: ${r.clientNom||'—'}\n- Client phone: ${r.telephone||r.clientTel||'—'}\n- Date: *${fmtD(r.dateTransfer)} at ${r.heureTransfer}*\n- From: ${r.pointDepart||'—'}${r.adresseDepart?' ('+r.adresseDepart+')':''}\n- To: ${r.destination||'—'}${r.adresseDestination?' ('+r.adresseDestination+')':''}\n- ${r.personnes||'—'} pax · ${r.malas||'0'} bags${det?'\n- '+det:''}${r.numVol?'\n- Flight: '+r.numVol:''}${r.numTransport?'\n- Transport: '+r.numTransport:''}\n- Proposed price: *${r.prixFinal?r.prixFinal+' €':'To confirm'}*\n\n- Hotel: *${ag||'—'}*\n\nPlease confirm, cancel or adjust the price in the system. Thank you!`;},
+  FR:(r,ag)=>{const det=formatPaxDetailPlain_(r);return `*DEMANDE DE DISPONIBILITÉ — HÔTEL*\n\nBonjour Agence Ruelas,\nNous demandons la disponibilité pour le transfert suivant :\n\n- Réf. : *${r.id}*\n- Client : ${r.clientNom||'—'}\n- Téléphone client : ${r.telephone||r.clientTel||'—'}\n- Date : *${fmtD(r.dateTransfer)} à ${r.heureTransfer}*\n- Départ : ${r.pointDepart||'—'}${r.adresseDepart?' ('+r.adresseDepart+')':''}\n- Destination : ${r.destination||'—'}${r.adresseDestination?' ('+r.adresseDestination+')':''}\n- ${r.personnes||'—'} pax · ${r.malas||'0'} bagages${det?'\n- '+det:''}${r.numVol?'\n- Vol : '+r.numVol:''}${r.numTransport?'\n- Transport : '+r.numTransport:''}\n- Prix proposé : *${r.prixFinal?r.prixFinal+' €':'À confirmer'}*\n\n- Hôtel : *${ag||'—'}*\n\nMerci de confirmer, annuler ou ajuster le prix dans le système. Merci !`;},
+  ES:(r,ag)=>{const det=formatPaxDetailPlain_(r);return `*SOLICITUD DE DISPONIBILIDAD — HOTEL*\n\nHola Agence Ruelas,\nSolicitamos disponibilidad para el siguiente traslado:\n\n- Ref.: *${r.id}*\n- Cliente: ${r.clientNom||'—'}\n- Teléfono cliente: ${r.telephone||r.clientTel||'—'}\n- Fecha: *${fmtD(r.dateTransfer)} a las ${r.heureTransfer}*\n- Salida: ${r.pointDepart||'—'}${r.adresseDepart?' ('+r.adresseDepart+')':''}\n- Destino: ${r.destination||'—'}${r.adresseDestination?' ('+r.adresseDestination+')':''}\n- ${r.personnes||'—'} pax · ${r.malas||'0'} maletas${det?'\n- '+det:''}${r.numVol?'\n- Vuelo: '+r.numVol:''}${r.numTransport?'\n- Transporte: '+r.numTransport:''}\n- Precio propuesto: *${r.prixFinal?r.prixFinal+' €':'A confirmar'}*\n\n- Hotel: *${ag||'—'}*\n\nPor favor confirmen, cancelen o ajusten el precio en el sistema. ¡Gracias!`;}
 };
 
 function getWaPreviewLang(){
@@ -1616,6 +1635,11 @@ function setLang(lang, zone){
   s('lbl-btn-pago',T.btnPago||'Transfer pago');
   s('lbl-hotel-wa-ttl',T.hotelWaTtl); s('lbl-hotel-wa-desc',T.hotelWaDesc);
   s('lbl-hotel-wa-btn',T.hotelWaBtn); s('lbl-copy-msg',T.copyMsg);
+  s('lbl-hotel-edit-sec',T.hotelEditSec||'Editar');
+  s('lbl-he-nom',T.heNom); s('lbl-he-tel',T.heTel); s('lbl-he-vol',T.heVol);
+  s('lbl-he-depart',T.heDepart); s('lbl-he-dest',T.heDest); s('lbl-he-date',T.heDate);
+  s('lbl-he-heure',T.heHeure); s('lbl-he-room',T.heRoom); s('lbl-he-com',T.heCom);
+  s('lbl-btn-hotel-save',T.btnHotelSave);
   s('lbl-cal-ttl',T.calTtl);
   s('lbl-wa-prev-lang',T.waPrevLang);
   s('lbl-tab-all',T.tabAll); s('lbl-tab-upcoming',T.tabUpcoming);
@@ -2336,20 +2360,109 @@ function renderModal(idx){
   const showCal = rDate && rDate >= today && r.statut !== 'cancelado' && r.statut !== 'realizado';
   document.getElementById('cal-box').style.display = showCal ? 'block' : 'none';
 
-  // Boutons selon statut + règle Phase 1 (≥ N heures avant transfer, N = policy do login)
+  // Boutons selon statut — l'hôtel ne confirme PAS (c'est l'Agence)
   const blocked = r.statut === 'realizado';
   const canEdit = !(APP.hotelPolicy && APP.hotelPolicy.peutModifier === false);
   const canMutate = canEdit && hotelPeutModifierAvantTransfer_(r);
   const canCancel = hotelPodeAnular_(r);
-  document.getElementById('btn-confirm-r').style.display = (!blocked && canEdit && r.statut !== 'confirmado') ? 'inline-flex' : 'none';
+  const btnConf = document.getElementById('btn-confirm-r');
+  if (btnConf) btnConf.style.display = 'none';
   document.getElementById('btn-cancel-r').style.display = (!blocked && r.statut !== 'cancelado' && canCancel) ? 'inline-flex' : 'none';
-  document.getElementById('btn-price-r').style.display = (blocked || !canMutate) ? 'none' : 'inline-flex';
+  document.getElementById('btn-price-r').style.display = (blocked || r.statut === 'confirmado' || !canMutate) ? 'none' : 'inline-flex';
   const alreadyPaid = (r.statutPaiement === 'payé' || r.statutPaiement === 'pago');
   const btnPago = document.getElementById('btn-pago-r');
   if (btnPago) btnPago.style.display = (r.statut === 'cancelado' || alreadyPaid) ? 'none' : 'inline-flex';
-  document.getElementById('prix-field').style.display = (blocked || !canMutate) ? 'none' : 'block';
-  document.getElementById('comment-field').style.display = (blocked || !canEdit || !hotelMayEditChamp_('commentaires')) ? 'none' : 'block';
+  document.getElementById('prix-field').style.display = (blocked || r.statut === 'confirmado' || !canMutate) ? 'none' : 'block';
+  document.getElementById('comment-field').style.display = (blocked || r.statut === 'confirmado' || !canEdit || !hotelMayEditChamp_('commentaires')) ? 'none' : 'block';
   document.getElementById('lbl-modal-actions').style.display = blocked ? 'none' : 'flex';
+  fillHotelEditForm_(r, canEdit, canMutate);
+}
+
+function fillHotelEditForm_(r, canEdit, canMutate){
+  const sec = document.getElementById('hotel-edit-sec');
+  const box = document.getElementById('hotel-edit-box');
+  if(!sec || !box) return;
+  const closed = r.statut === 'realizado' || r.statut === 'cancelado';
+  if(closed || !canEdit){
+    sec.style.display = 'none';
+    box.style.display = 'none';
+    return;
+  }
+  sec.style.display = 'block';
+  box.style.display = 'block';
+  const conf = r.statut === 'confirmado';
+  const show = (id, on) => { const el = document.getElementById(id); if(el) el.style.display = on ? 'block' : 'none'; };
+  // Après confirm : nom + vol seulement
+  show('he-wrap-nom', true);
+  show('he-wrap-vol', true);
+  show('he-wrap-tel', !conf);
+  show('he-wrap-depart', !conf && canMutate);
+  show('he-wrap-dest', !conf && canMutate);
+  show('he-wrap-date', !conf && canMutate);
+  show('he-wrap-heure', !conf && canMutate);
+  show('he-wrap-room', !conf);
+  show('he-wrap-com', !conf);
+  const set = (id, v) => { const el = document.getElementById(id); if(el) el.value = v == null ? '' : v; };
+  set('he-nom', r.clientNom || '');
+  set('he-tel', r.telephone || '');
+  set('he-vol', r.numVol || '');
+  set('he-depart', r.pointDepart || '');
+  set('he-dest', r.destination || '');
+  set('he-date', r.dateTransfer || '');
+  set('he-heure', r.heureTransfer || '');
+  set('he-room', r.numChambre || '');
+  // Commentaire libre uniquement (sans bloc technique injecté) — champ vide si rien
+  set('he-com', '');
+  const heMsg = document.getElementById('he-msg');
+  if(heMsg){ heMsg.className = 'modal-msg'; heMsg.textContent = conf ? (t().hotelEditLocked || '') : ''; if(conf) heMsg.classList.add('show'); }
+}
+
+async function saveHotelEdit(){
+  if(!APP.curId) return;
+  const T2 = t();
+  const r = APP.reservas.find(x => x.id === APP.curId) || APP.curWaResa;
+  if(!r) return;
+  const conf = r.statut === 'confirmado';
+  const champs = {};
+  const v = id => { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
+  champs.clientNom = v('he-nom');
+  champs.numVol = v('he-vol');
+  if(!conf){
+    champs.telephone = v('he-tel');
+    champs.pointDepart = v('he-depart');
+    champs.destination = v('he-dest');
+    champs.dateTransfer = v('he-date');
+    champs.heureTransfer = v('he-heure');
+    champs.numChambre = v('he-room');
+    const com = v('he-com');
+    if(com) champs.commentaires = com;
+  }
+  const btn = document.getElementById('btn-hotel-save-edit');
+  if(btn) btn.disabled = true;
+  const heMsg = document.getElementById('he-msg');
+  try {
+    const d = await api({
+      action: 'editarReservacaoHotel',
+      agencyId: APP.agencyId, token: APP.token,
+      reservationId: APP.curId, champs
+    });
+    if(d.success){
+      if(heMsg){ heMsg.textContent = T2.hotelSaveOk || 'OK'; heMsg.className = 'modal-msg success show'; }
+      toast(T2.hotelSaveOk || 'OK', 'success');
+      Object.assign(r, champs);
+      const idx = APP.reservas.findIndex(x => x.id === APP.curId);
+      if(idx !== -1) Object.assign(APP.reservas[idx], champs);
+      renderTable();
+      setTimeout(() => openDetail(APP.curId), 600);
+    } else {
+      if(d.sessionExpired){ doLogout(); return; }
+      if(heMsg){ heMsg.textContent = '❌ ' + (d.error || T2.hotelSaveErr); heMsg.className = 'modal-msg error show'; }
+    }
+  } catch(e){
+    if(heMsg){ heMsg.textContent = '❌ ' + e.message; heMsg.className = 'modal-msg error show'; }
+  } finally {
+    if(btn) btn.disabled = false;
+  }
 }
 
 /** Heures restantes avant date+heure transfer (Phase 1 policy) */
@@ -2893,8 +3006,25 @@ async function submitNovaReserva(){
     if(d.success){
       novaMsg(T2.nvOk + (d.id ? ' — ' + d.id : ''), 'success');
       toast(T2.nvOk, 'success');
+      const createdId = d.id;
+      const waSnap = {
+        id: createdId,
+        clientNom: nom, telephone: tel, clientTel: tel,
+        dateTransfer: data, heureTransfer: hora,
+        pointDepart, adresseDepart, destination, adresseDestination,
+        personnes, malas, numVol: val('nv-voo'),
+        adultos: String(adultos), bebes: String(bebes),
+        cadeiraRodas: String(cadeiraRodas), cadeiraBebe: String(cadeiraBebe),
+        malasGrandes: String(malasGrandes), mochilas: String(mochilas),
+        prixFinal: '', statut: 'pendente'
+      };
       resetNovaForm();
       loadReservas();
+      if(createdId){
+        APP.curWaResa = waSnap;
+        APP.curId = createdId;
+        if(confirm(T2.nvAskWa || 'WhatsApp?')) openWA();
+      }
     } else {
       if(d.sessionExpired){ doLogout(); return; }
       novaMsg('❌ ' + (d.error || 'Erro'), 'error');
@@ -2975,13 +3105,39 @@ function closeHistoricoModal(){
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// EXPORT EXCEL (SheetJS)
+// EXPORT — uniquement les réservations remplies / créées par CE hôtel
 // ═══════════════════════════════════════════════════════════════════
+function hotelIsOwnCreated_(r){
+  if(!r) return false;
+  const hid=String(APP.agencyId||'').trim();
+  if(!hid) return false;
+  const cree=String(r.criadoPor||r.creePar||'').trim();
+  // Strict : créées par ce compte hôtel
+  return cree===hid;
+}
+function hotelExportBaseRows_(){
+  // Vue filtrée actuelle ∩ créées par l'hôtel
+  const view=typeof getTableFilterRows==='function'?getTableFilterRows():(APP.reservas||[]);
+  return view.filter(hotelIsOwnCreated_);
+}
+function hotelUpcomingOwn_(){
+  const today=new Date();today.setHours(0,0,0,0);
+  return (APP.reservas||[])
+    .filter(hotelIsOwnCreated_)
+    .filter(r=>r.statut!=='realizado'&&r.statut!=='cancelado'&&
+               parseDate(r.dateTransfer)&&parseDate(r.dateTransfer)>=today)
+    .sort((a,b)=>(a.dateTransfer||'').localeCompare(b.dateTransfer||'')
+              ||(a.heureTransfer||'').localeCompare(b.heureTransfer||''));
+}
+
 function exportExcel(){
   const T2 = t();
-  const viewRows = getTableFilterRows();
-  if(!APP.reservas.length){ toast(T2.emptyTitle, 'error'); return; }
-  if(!viewRows.length){ toast(T2.emptyTitle, 'error'); return; }
+  const viewRows = hotelExportBaseRows_();
+  if(!(APP.reservas||[]).some(hotelIsOwnCreated_)){
+    toast(T2.expOnlyOwn||'Sem reservas criadas por este hotel para exportar.','error');
+    return;
+  }
+  if(!viewRows.length){ toast(T2.expNoMatch||T2.emptyTitle||'Nenhuma reserva','error'); return; }
   if(typeof XLSX === 'undefined'){ toast('SheetJS not loaded', 'error'); return; }
   const hdrs = [T2.colRef, T2.lblClient, T2.lblEmail, T2.lblPhone, 'OTA',
     'Data', 'Hora', T2.lblOrigin, 'Morada Partida', T2.lblDest, 'Morada Destino',
@@ -2998,12 +3154,7 @@ function exportExcel(){
   ws['!cols'] = colWidths.map(w => ({wch:w}));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Reservas');
-  // Aba 2: Próximas
-  const today = new Date(); today.setHours(0,0,0,0);
-  const upcoming = APP.reservas
-    .filter(r => r.statut !== 'realizado' && r.statut !== 'cancelado' &&
-                 parseDate(r.dateTransfer) && parseDate(r.dateTransfer) >= today)
-    .sort((a,b) => (a.dateTransfer||'').localeCompare(b.dateTransfer||''));
+  const upcoming = hotelUpcomingOwn_();
   if(upcoming.length){
     const wsU = XLSX.utils.aoa_to_sheet([hdrs, ...upcoming.map(r => [
       r.id, r.clientNom, r.clientEmail, r.telephone, r.numReservaOta,
@@ -3017,23 +3168,18 @@ function exportExcel(){
   }
   const fname = `RU_Hotel_${APP.agencyId}_${new Date().toISOString().slice(0,10)}.xlsx`;
   XLSX.writeFile(wb, fname);
-  toast(T2.toastExcel, 'success');
+  toast(T2.toastExcel||'Excel exportado','success');
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// EXPORT PDF
-// ═══════════════════════════════════════════════════════════════════
 function exportPDF(){
   const T2 = t();
-  if(!APP.reservas.length){ toast(T2.emptyTitle, 'error'); return; }
-  const viewRows = getTableFilterRows();
-  if(!viewRows.length){ toast(T2.emptyTitle, 'error'); return; }
-  const today = new Date(); today.setHours(0,0,0,0);
-  const upcoming = APP.reservas
-    .filter(r => r.statut !== 'realizado' && r.statut !== 'cancelado' &&
-                 parseDate(r.dateTransfer) && parseDate(r.dateTransfer) >= today)
-    .sort((a,b) => (a.dateTransfer||'').localeCompare(b.dateTransfer||'')
-                || (a.heureTransfer||'').localeCompare(b.heureTransfer||''));
+  const viewRows = hotelExportBaseRows_();
+  if(!(APP.reservas||[]).some(hotelIsOwnCreated_)){
+    toast(T2.expOnlyOwn||'Sem reservas criadas por este hotel para exportar.','error');
+    return;
+  }
+  if(!viewRows.length){ toast(T2.expNoMatch||T2.emptyTitle||'Nenhuma reserva','error'); return; }
+  const upcoming = hotelUpcomingOwn_();
 
   const rows = (arr) => arr.map(r =>
     `<tr><td>${r.id}</td><td>${r.clientNom||'—'}</td><td>${fmtD(r.dateTransfer)}</td><td>${r.heureTransfer||'—'}</td><td>${r.pointDepart||'—'}</td><td>${r.destination||'—'}</td><td>${r.personnes||'—'}</td><td>${r.prixFinal ? r.prixFinal+'€' : '—'}</td><td>${r.statut}</td></tr>`
@@ -3050,13 +3196,15 @@ function exportPDF(){
     td{padding:7px 10px;border-bottom:1px solid #E5EDF5;font-size:11px}
     tr:nth-child(even) td{background:#F7F9FB}
     .footer{text-align:center;font-size:10px;color:#9CA3AF;border-top:1px solid #E5EDF5;padding-top:10px;margin-top:8px}
+    .note{font-size:11px;color:#6B7280;margin:0 0 12px}
   </style></head><body>
-  <h1>🏨 Portal Hotel — Agence Ruelas — ${APP.agencyNom}</h1>
+  <h1>🏨 Portal Hotel — Agence Ruelas — ${APP.agencyNom||APP.agencyId||''}</h1>
   <div class="sub">${new Date().toLocaleDateString('pt-PT',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
-  ${upcoming.length ? `<h3>🗓 ${T2.upcomingTitle} (${upcoming.length})</h3>
+  <p class="note">Relatório limitado às reservas criadas por este hotel (${APP.agencyId}).</p>
+  ${upcoming.length ? `<h3>🗓 ${T2.upcomingTitle||'A realizar'} (${upcoming.length})</h3>
   <table><thead><tr><th>Ref.</th><th>Cliente</th><th>Data</th><th>Hora</th><th>Partida</th><th>Destino</th><th>Pax</th><th>Preço</th><th>Estado</th></tr></thead>
   <tbody>${rows(upcoming)}</tbody></table>` : ''}
-  <h3>📋 ${T2.cardTtl} (${viewRows.length})</h3>
+  <h3>📋 ${T2.cardTtl||'Reservas'} (${viewRows.length})</h3>
   <table><thead><tr><th>Ref.</th><th>Cliente</th><th>Data</th><th>Hora</th><th>Partida</th><th>Destino</th><th>Pax</th><th>Preço</th><th>Estado</th></tr></thead>
   <tbody>${rows(viewRows)}</tbody></table>
   <div class="footer">Agence Ruelas · Hotel: ${APP.agencyId} · Gerado em ${new Date().toLocaleString('pt-PT')}</div>
@@ -3065,7 +3213,7 @@ function exportPDF(){
   const w = window.open('', '_blank');
   if(!w){ toast('Pop-up bloqueado — active os pop-ups', 'error'); return; }
   w.document.write(html); w.document.close(); w.print();
-  toast(T2.toastPdf, 'success');
+  toast(T2.toastPdf||'PDF','success');
 }
 
 // ═══════════════════════════════════════════════════════════════════
