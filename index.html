@@ -1364,39 +1364,17 @@ body{font-size:clamp(13px,1.4vw + 10px,15px)}
               <div class="m-field"><label id="lbl-nv-hora">Hora do Transfer *</label><input class="m-inp" type="time" id="nv-hora"></div>
               <div class="m-field"><label id="lbl-nv-partida">Ponto de Partida *</label>
                 <select class="m-sel" id="nv-partida-sel" onchange="onNvLieuChange('depart')"></select>
-                <input class="m-inp" type="text" id="nv-partida-custom" style="display:none;margin-top:6px" placeholder="Nome do lugar…" oninput="scheduleNvRouteMap()">
+                <input class="m-inp" type="text" id="nv-partida-custom" style="display:none;margin-top:6px" placeholder="Nome do lugar…">
               </div>
               <div class="m-field"><label><span id="lbl-nv-end-partida">Morada de Partida</span> <span id="nv-addr-dep-req" style="font-size:10px;color:var(--ts)">(opt.)</span></label>
-                <input class="m-inp" type="text" id="nv-end-partida" placeholder="Rua, nº…" oninput="scheduleNvRouteMap()">
+                <input class="m-inp" type="text" id="nv-end-partida" placeholder="Rua, nº…">
               </div>
               <div class="m-field"><label id="lbl-nv-destino">Destino *</label>
                 <select class="m-sel" id="nv-destino-sel" onchange="onNvLieuChange('dest')"></select>
-                <input class="m-inp" type="text" id="nv-destino-custom" style="display:none;margin-top:6px" placeholder="Nome do lugar…" oninput="scheduleNvRouteMap()">
+                <input class="m-inp" type="text" id="nv-destino-custom" style="display:none;margin-top:6px" placeholder="Nome do lugar…">
               </div>
               <div class="m-field"><label><span id="lbl-nv-end-destino">Morada de Destino</span> <span id="nv-addr-dest-req" style="font-size:10px;color:var(--ts)">(opt.)</span></label>
-                <input class="m-inp" type="text" id="nv-end-destino" placeholder="Rua, nº…" oninput="scheduleNvRouteMap()">
-              </div>
-              <div class="m-field full">
-                <div class="route-map-wrap" id="nv-route-map-wrap">
-                  <label class="route-map-toggle" for="nv-route-map-cb">
-                    <input type="checkbox" id="nv-route-map-cb" onchange="toggleNvRouteMap(this.checked)">
-                    <span class="route-map-toggle-txt" id="lbl-nv-map-toggle">🗺️ Ver trajeto no mapa</span>
-                    <span class="route-map-toggle-hint" id="lbl-nv-map-hint">opcional · tempo estimado aproximado segundo a distância</span>
-                  </label>
-                  <div class="route-map-body" id="nv-route-map-body">
-                    <div class="route-map-bar">
-                      <div class="route-map-legend">
-                        <span class="route-map-pin"><span class="route-map-dot a">A</span> Partida</span>
-                        <span class="route-map-pin"><span class="route-map-dot b">B</span> Destino</span>
-                      </div>
-                      <div class="route-map-meta">
-                        <div class="route-map-eta" id="nv-route-map-eta"></div>
-                        <div class="route-map-status" id="nv-route-map-status">Selecione partida / destino</div>
-                      </div>
-                    </div>
-                    <div class="route-map-el" id="nv-route-map" role="img" aria-label="Mapa do trajeto"></div>
-                  </div>
-                </div>
+                <input class="m-inp" type="text" id="nv-end-destino" placeholder="Rua, nº…">
               </div>
 
               <div class="nova-sec-sep" id="lbl-nv-sec-extra">📝 Complementos</div>
@@ -3416,69 +3394,10 @@ function getNvRoutePoint_(which){
   if(!addr && hotel && name===hotel && APP.hotelAdresse) addr=String(APP.hotelAdresse).trim();
   return {name,addr};
 }
-function scheduleNvRouteMap(){
-  if(!document.getElementById('nv-route-map-cb')?.checked) return;
-  scheduleRouteMapRefresh_('nv',()=>{
-    const dep=getNvRoutePoint_('depart');
-    const dest=getNvRoutePoint_('dest');
-    const key=[dep.name,dep.addr,dest.name,dest.addr].join('|');
-    if(key===APP._lastNvRouteKey && _routeMapInst.nv && _routeMapInst.nv.map){
-      return {
-        key:'nv',
-        mapId:'nv-route-map',
-        statusId:'nv-route-map-status',
-        etaId:'nv-route-map-eta',
-        depName:dep.name,
-        depAddr:dep.addr,
-        destName:dest.name,
-        destAddr:dest.addr,
-        _skip:true
-      };
-    }
-    APP._lastNvRouteKey=key;
-    return {
-      key:'nv',
-      mapId:'nv-route-map',
-      statusId:'nv-route-map-status',
-      etaId:'nv-route-map-eta',
-      depName:dep.name,
-      depAddr:dep.addr,
-      destName:dest.name,
-      destAddr:dest.addr
-    };
-  });
-}
-function toggleNvRouteMap(on){
-  const wrap=document.getElementById('nv-route-map-wrap');
-  if(wrap) wrap.classList.toggle('open',!!on);
-  if(on){
-    APP._lastNvRouteKey='';
-    scheduleNvRouteMap();
-    setTimeout(()=>{
-      try{
-        const inst=_routeMapInst.nv;
-        if(inst&&inst.map) inst.map.invalidateSize();
-      }catch(e){}
-    },120);
-  }else{
-    const eta=document.getElementById('nv-route-map-eta');
-    if(eta) eta.textContent='';
-  }
-}
-function invalidateNvRouteMap_(){
-  setTimeout(()=>{
-    try{
-      const inst=_routeMapInst.nv;
-      if(inst&&inst.map) inst.map.invalidateSize();
-    }catch(e){}
-  },120);
-}
-(function bindNvRouteMapViewport_(){
-  let t;
-  const run=()=>{ clearTimeout(t); t=setTimeout(invalidateNvRouteMap_,200); };
-  window.addEventListener('resize',run,{passive:true});
-  window.addEventListener('orientationchange',run,{passive:true});
-})();
+function scheduleNvRouteMap(){ /* mapa removido */ }
+function toggleNvRouteMap(){ /* mapa removido */ }
+function invalidateNvRouteMap_(){}
+function isNvRouteMapOpen_(){ return false; }
 
 async function loadHotelLieux(opts){
   opts=opts||{};
@@ -3722,7 +3641,8 @@ async function submitNovaReserva(){
       destination, adresseDestination,
       dateTransfer: data, heureTransfer: hora,
       numVol: val('nv-voo'), numChambre: val('nv-quarto'),
-      commentaires: val('nv-com')
+      commentaires: val('nv-com'),
+      prixFinal: String((val('nv-origem') === 'hotel') ? 25 : 35)
     };
     const d = await api(payload);
     if(d.success){
