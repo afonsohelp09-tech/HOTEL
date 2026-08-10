@@ -1544,7 +1544,6 @@ body{font-size:clamp(13px,1.4vw + 10px,15px)}
         <button class="btn btn-warn btn-sm" id="btn-price-r" onclick="doChangePrice()">💶 <span id="lbl-btn-price">Alterar Preço</span></button>
         <button class="btn btn-gold btn-sm" id="btn-pago-r" onclick="doMarcarPago()">💶 <span id="lbl-btn-pago">Transfer pago</span></button>
         <button class="btn btn-danger" id="btn-cancel-r" onclick="doAction('cancelado')">❌ <span id="lbl-btn-cancel">Cancelar</span></button>
-        <button class="btn btn-success" id="btn-confirm-r" onclick="doAction('confirmado')">✅ <span id="lbl-btn-confirm">Confirmar</span></button>
       </div>
     </div>
   </div>
@@ -1896,7 +1895,7 @@ function setLang(lang, zone){
   s('lbl-modal-ttl',T.modalTtl); s('lbl-modal-actions',T.modalActions);
   s('lbl-m-prix',T.mPrix); s('lbl-m-comment',T.mComment);
   s('lbl-btn-close',T.btnClose); s('lbl-btn-cancel',T.btnCancel);
-  s('lbl-btn-confirm',T.btnConfirm); s('lbl-btn-price',T.btnPrice);
+  s('lbl-btn-price',T.btnPrice);
   s('lbl-btn-pago',T.btnPago||'Transfer pago');
   s('lbl-hotel-wa-ttl',T.hotelWaTtl); s('lbl-hotel-wa-desc',T.hotelWaDesc);
   s('lbl-hotel-wa-btn',T.hotelWaBtn); s('lbl-copy-msg',T.copyMsg);
@@ -2476,8 +2475,6 @@ function renderTable(){
     let acts = `<button class="btn btn-ghost btn-sm" onclick="openDetail('${r.id}')" title="Detalhes">👁</button>`;
     acts += `<button class="btn btn-ghost btn-sm" onclick="viewHistorico('${r.id}')" title="${T2.tabHistorico||'Histórico'}">📁</button>`;
     if(!blocked){
-      if(r.statut !== 'confirmado')
-        acts += `<button class="btn btn-success btn-sm" onclick="quickConfirm('${r.id}')" title="${T2.btnConfirm}">✅</button>`;
       if(r.statut !== 'cancelado' && hotelPodeAnular_(r))
         acts += `<button class="btn btn-danger btn-sm" onclick="quickCancel('${r.id}')" title="${T2.btnCancel}">❌</button>`;
     }
@@ -2675,8 +2672,6 @@ function renderModal(idx){
   const canEdit = !(APP.hotelPolicy && APP.hotelPolicy.peutModifier === false);
   const canMutate = canEdit && hotelPeutModifierAvantTransfer_(r);
   const canCancel = hotelPodeAnular_(r);
-  const btnConf = document.getElementById('btn-confirm-r');
-  if (btnConf) btnConf.style.display = 'none';
   document.getElementById('btn-cancel-r').style.display = (!blocked && r.statut !== 'cancelado' && canCancel) ? 'inline-flex' : 'none';
   document.getElementById('btn-price-r').style.display = (blocked || r.statut === 'confirmado' || !canMutate) ? 'none' : 'inline-flex';
   const alreadyPaid = (r.statutPaiement === 'payé' || r.statutPaiement === 'pago');
@@ -2842,8 +2837,7 @@ function hotelPodeAnular_(r) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════════════
-// WHATSAPP HÔTEL — Confirmer à l'hôtel
+// WHATSAPP HÔTEL — Demande de disponibilité à l'Agence
 // ═══════════════════════════════════════════════════════════════════
 function normaliserDigitsPourWaMe(s){
   s=String(s||'').trim();
@@ -2984,12 +2978,15 @@ function addToIcal(){
 // ═══════════════════════════════════════════════════════════════════
 async function doAction(nouveauStatut){
   if(!APP.curId) return;
+  // Hôtel : confirmation réservée à l'Agence (jamais côté portail hôtel)
+  if(nouveauStatut === 'confirmado'){
+    toast(t().nvAgencyHint || 'A confirmação é feita pela Agência.', 'warn');
+    return;
+  }
   const prix = document.getElementById('m-prix').value;
   const com = document.getElementById('m-comment').value.trim();
-  const bc = document.getElementById('btn-confirm-r');
   const bx = document.getElementById('btn-cancel-r');
   const bp = document.getElementById('btn-price-r');
-  if(bc) bc.disabled = true;
   if(bx) bx.disabled = true;
   if(bp) bp.disabled = true;
   try {
@@ -3000,9 +2997,8 @@ async function doAction(nouveauStatut){
       nouveauStatut, nouveauPrix: prix, commentaire: com
     });
     if(d.success){
-      const isConf = nouveauStatut === 'confirmado';
-      msgModal(isConf ? t().msgConf : t().msgCanc, isConf ? 'success' : 'error');
-      toast(isConf ? t().toastConf : t().toastCanc, isConf ? 'success' : 'error');
+      msgModal(t().msgCanc, 'error');
+      toast(t().toastCanc, 'error');
       const idx = APP.reservas.findIndex(r => r.id === APP.curId);
       if(idx !== -1){
         APP.reservas[idx].statut = nouveauStatut;
@@ -3017,7 +3013,6 @@ async function doAction(nouveauStatut){
   } catch(e){
     msgModal('❌ ' + e.message, 'error');
   } finally {
-    if(bc) bc.disabled = false;
     if(bx) bx.disabled = false;
     if(bp) bp.disabled = false;
   }
@@ -3026,11 +3021,9 @@ async function doAction(nouveauStatut){
 async function doMarcarPago(){
   if(!APP.curId) return;
   const bpago = document.getElementById('btn-pago-r');
-  const bc = document.getElementById('btn-confirm-r');
   const bx = document.getElementById('btn-cancel-r');
   const bp = document.getElementById('btn-price-r');
   if(bpago) bpago.disabled = true;
-  if(bc) bc.disabled = true;
   if(bx) bx.disabled = true;
   if(bp) bp.disabled = true;
   try {
@@ -3054,7 +3047,6 @@ async function doMarcarPago(){
     msgModal('❌ ' + e.message, 'error');
   } finally {
     if(bpago) bpago.disabled = false;
-    if(bc) bc.disabled = false;
     if(bx) bx.disabled = false;
     if(bp) bp.disabled = false;
   }
@@ -3068,10 +3060,8 @@ async function doChangePrice(){
     msgModal('⚠️ Introduza um preço válido (número positivo)', 'error'); return;
   }
   const r = APP.reservas.find(x => x.id === APP.curId);
-  const bc = document.getElementById('btn-confirm-r');
   const bx = document.getElementById('btn-cancel-r');
   const bp = document.getElementById('btn-price-r');
-  if(bc) bc.disabled = true;
   if(bx) bx.disabled = true;
   if(bp) bp.disabled = true;
   try {
@@ -3095,17 +3085,9 @@ async function doChangePrice(){
   } catch(e){
     msgModal('❌ ' + e.message, 'error');
   } finally {
-    if(bc) bc.disabled = false;
     if(bx) bx.disabled = false;
     if(bp) bp.disabled = false;
   }
-}
-
-async function quickConfirm(id){
-  APP.curId = id;
-  document.getElementById('m-prix').value = '';
-  document.getElementById('m-comment').value = '';
-  await doAction('confirmado');
 }
 
 async function quickCancel(id){
