@@ -271,7 +271,23 @@ td.mono{font-family:monospace;font-size:12px;color:var(--navy3);font-weight:600}
 .b-real{background:var(--info-bg);color:var(--info);border:1px solid var(--info-b)}.b-real::before{background:var(--info)}
 .badge-new{background:linear-gradient(135deg,#7C3AED,#A855F7);color:#fff;font-size:9px;padding:2px 7px;border-radius:10px;margin-right:4px}
 .badge-soon{background:var(--up-bg);color:var(--upcoming);border:1px solid var(--up-b);font-size:9px;padding:2px 7px;border-radius:10px;margin-right:4px}
-.row-acts{display:flex;gap:4px}
+.row-acts{display:flex;gap:4px;align-items:center;justify-content:flex-end}
+.acts-inline{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.acts-dd{position:relative;display:none;vertical-align:middle}
+.acts-dd-btn{font-size:20px;font-weight:700;line-height:1;min-width:36px;padding:6px 10px;letter-spacing:.02em}
+.acts-dd-menu{
+  display:none;position:absolute;right:0;top:calc(100% + 4px);z-index:60;
+  min-width:44px;padding:6px;flex-direction:column;gap:4px;
+  background:var(--white);border:1px solid var(--border);border-radius:10px;
+  box-shadow:0 10px 28px rgba(15,23,42,.18);
+}
+.acts-dd.open .acts-dd-menu{display:flex}
+.acts-dd-menu .btn{width:100%;justify-content:center;min-width:44px;min-height:40px}
+html[data-theme="dark"] .acts-dd-menu{background:var(--surface);box-shadow:0 10px 28px rgba(0,0,0,.45)}
+@media(max-width:768px){
+  .acts-inline{display:none!important}
+  .acts-dd{display:inline-flex!important}
+}
 .empty{padding:60px 20px;text-align:center}
 .empty-icon{font-size:44px;margin-bottom:14px;opacity:.35}
 .empty-title{font-size:16px;font-weight:600;color:var(--navy);margin-bottom:6px}
@@ -2432,6 +2448,57 @@ function sortParceiroData(rows){
 // ═══════════════════════════════════════════════════════════════════
 // TABLE
 // ═══════════════════════════════════════════════════════════════════
+function closeActsMenus_(){
+  document.querySelectorAll('.acts-dd.open').forEach(el => {
+    el.classList.remove('open');
+    const menu = el.querySelector('.acts-dd-menu');
+    if(menu){
+      menu.style.position = '';
+      menu.style.top = '';
+      menu.style.right = '';
+      menu.style.left = '';
+      menu.style.bottom = '';
+    }
+  });
+}
+function toggleActsMenu_(ev, btn){
+  if(ev){ ev.preventDefault(); ev.stopPropagation(); }
+  const dd = btn && btn.closest ? btn.closest('.acts-dd') : null;
+  if(!dd) return;
+  const wasOpen = dd.classList.contains('open');
+  closeActsMenus_();
+  if(wasOpen) return;
+  dd.classList.add('open');
+  const menu = dd.querySelector('.acts-dd-menu');
+  if(!menu) return;
+  const rect = btn.getBoundingClientRect();
+  menu.style.position = 'fixed';
+  menu.style.left = 'auto';
+  menu.style.right = Math.max(8, window.innerWidth - rect.right) + 'px';
+  menu.style.top = (rect.bottom + 4) + 'px';
+  menu.style.bottom = 'auto';
+  requestAnimationFrame(() => {
+    const m = menu.getBoundingClientRect();
+    if(m.bottom > window.innerHeight - 8){
+      menu.style.top = Math.max(8, rect.top - m.height - 4) + 'px';
+    }
+    if(m.left < 8){
+      menu.style.right = 'auto';
+      menu.style.left = '8px';
+    }
+  });
+}
+function wrapActsMenu_(innerHtml, title){
+  return `<div class="acts-inline">${innerHtml}</div>
+  <div class="acts-dd" onclick="event.stopPropagation()">
+    <button type="button" class="btn btn-ghost btn-sm acts-dd-btn" onclick="toggleActsMenu_(event,this)" title="${title||'Ações'}" aria-label="${title||'Ações'}" aria-haspopup="true">⋮</button>
+    <div class="acts-dd-menu" role="menu" onclick="closeActsMenus_()">${innerHtml}</div>
+  </div>`;
+}
+document.addEventListener('click', closeActsMenus_);
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeActsMenus_(); });
+document.addEventListener('scroll', closeActsMenus_, true);
+
 function renderTable(){
   const T2 = t(), data = sortParceiroData(getTableFilterRows()), total = data.length;
   if(!total){
@@ -2472,12 +2539,13 @@ function renderTable(){
     const isSoon = rDate && rDate >= today && rDate <= tomorrow &&
                    r.statut !== 'realizado' && r.statut !== 'cancelado';
     const isNew = r.nonAttribuee;
-    let acts = `<button class="btn btn-ghost btn-sm" onclick="openDetail('${r.id}')" title="Detalhes">👁</button>`;
-    acts += `<button class="btn btn-ghost btn-sm" onclick="viewHistorico('${r.id}')" title="${T2.tabHistorico||'Histórico'}">📁</button>`;
+    let actInner = `<button class="btn btn-ghost btn-sm" onclick="openDetail('${r.id}')" title="Detalhes">👁</button>`;
+    actInner += `<button class="btn btn-ghost btn-sm" onclick="viewHistorico('${r.id}')" title="${T2.tabHistorico||'Histórico'}">📁</button>`;
     if(!blocked){
       if(r.statut !== 'cancelado' && hotelPodeAnular_(r))
-        acts += `<button class="btn btn-danger btn-sm" onclick="quickCancel('${r.id}')" title="${T2.btnCancel}">❌</button>`;
+        actInner += `<button class="btn btn-danger btn-sm" onclick="quickCancel('${r.id}')" title="${T2.btnCancel}">❌</button>`;
     }
+    const acts = wrapActsMenu_(actInner, T2.colActs || 'Ações');
     html += `<tr>
       <td class="mono">${r.id}</td>
       <td class="bold">
