@@ -372,7 +372,23 @@ html[data-theme="dark"] .acts-dd-menu{background:var(--surface);box-shadow:0 10p
 .nova-sec-sep:first-child{border-top:none;margin-top:0;padding-top:0}
 .nova-sec-sep::after{content:'';flex:1;height:1px;background:var(--border2)}
 .nova-agency-hint{grid-column:1/-1;font-size:12.5px;line-height:1.45;color:#7a5a12;background:rgba(212,160,23,.12);border:1px solid rgba(212,160,23,.35);border-radius:10px;padding:12px 14px;margin:0 0 4px}
-.nova-flow-hint{grid-column:1/-1;font-size:12px;line-height:1.4;color:var(--ts);margin:0 0 2px}
+.nova-flow-hint{display:none}
+/* Nova simplifiée — écran 1 + mais opções */
+.nova-sense{grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface)}
+.nova-sense-pill{font-size:11px;font-weight:700;letter-spacing:.03em;padding:5px 11px;border-radius:999px;border:1px solid transparent;white-space:nowrap}
+.nova-sense-pill.in{background:#EFF6FF;border-color:#BFDBFE;color:#1B4F72}
+.nova-sense-pill.out{background:#F5F3FF;border-color:#DDD6FE;color:#7C3AED}
+.nova-sense-pill.local{background:#F0FDFA;border-color:#99F6E4;color:#0F766E}
+.nova-sense-pill.unk{background:#F1F5F9;border-color:var(--border);color:var(--ts)}
+.nova-sense-txt{font-size:12px;color:var(--tm);flex:1;min-width:120px}
+.nova-opts{display:none;grid-column:1/-1;margin-top:4px;padding:14px;border:1px dashed var(--border);border-radius:12px;background:var(--surface)}
+.nova-opts.open{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+.nova-opts .m-field.full,.nova-opts .nova-sec-sep{grid-column:1/-1}
+.nova-opts-hd{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.nova-opts-hd strong{font-size:13px;color:var(--navy)}
+.m-inp.need{border-color:#F59E0B;background:#FFFBEB}
+html[data-theme="dark"] .nova-sense{background:var(--surface);border-color:var(--border)}
+html[data-theme="dark"] .nova-opts{background:var(--surface);border-color:var(--border)}
 .nova-actions{padding:16px 20px;border-top:1px solid var(--border2);background:var(--surface);display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
 .nova-msg{padding:10px 14px;border-radius:var(--r);font-size:12px;margin:0 20px 14px;display:none}
 .nova-msg.show{display:block}
@@ -1309,97 +1325,109 @@ body{font-size:clamp(13px,1.4vw + 10px,15px)}
           <div class="nova-msg" id="nova-msg"></div>
           <div class="nova-body">
             <div class="nova-grid">
-              <div class="nova-agency-hint" id="lbl-nv-agency-hint">A Agência Ruelas confirma as reservas criadas pelo hotel. Após guardar, a reserva fica Pendente até confirmação da agência. Pode enviar WhatsApp para disponibilizar.</div>
-              <div class="nova-flow-hint" id="lbl-nv-flow-hint">Preencha pela ordem: Cliente → Passageiros → Transfer → Complementos. Data/hora não podem ser no passado.</div>
+              <div class="nova-agency-hint" id="lbl-nv-agency-hint" style="display:none">A Agência Ruelas confirma as reservas criadas pelo hotel. Após guardar, a reserva fica Pendente até confirmação da agência. Pode enviar WhatsApp para disponibilizar.</div>
+              <div class="nova-flow-hint" id="lbl-nv-flow-hint" style="display:none"></div>
 
-              <div class="nova-sec-sep" id="lbl-nv-sec-client">👤 Cliente</div>
-              <div class="m-field"><label id="lbl-nv-nom">Nome do Cliente *</label><input class="m-inp" type="text" id="nv-nom" autocomplete="name"></div>
-              <div class="m-field"><label id="lbl-nv-email">Email *</label><input class="m-inp" type="email" id="nv-email" autocomplete="email"></div>
+              <div class="nova-sec-sep" id="lbl-nv-sec-client">Cliente</div>
+              <div class="m-field"><label id="lbl-nv-nom">Nome *</label><input class="m-inp" type="text" id="nv-nom" autocomplete="name"></div>
               <div class="m-field"><label id="lbl-nv-tel">Telefone *</label><input class="m-inp" type="text" id="nv-tel" autocomplete="tel"></div>
-              <div class="m-field"><label id="lbl-nv-ota">Ref. OTA / Reserva</label><input class="m-inp" type="text" id="nv-ota"></div>
+              <div class="m-field"><label id="lbl-nv-email">Email <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ts)">(opcional)</span></label><input class="m-inp" type="email" id="nv-email" autocomplete="email"></div>
 
-              <div class="nova-sec-sep" id="lbl-nv-sec-pax">👥 Passageiros & bagagens</div>
-              <div class="m-field"><label id="lbl-nv-adultos">Adultos *</label>
-                <select class="m-sel" id="nv-adultos" onchange="onNvCountSelect('nv-adultos')">
-                  <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-                  <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
-                  <option value="__custom__">✏️ Outro…</option>
-                </select>
-                <input class="m-inp" type="number" min="1" id="nv-adultos-custom" style="display:none;margin-top:6px" placeholder="Nº" oninput="updateNovaPaxSummary()">
-              </div>
-              <div class="m-field"><label id="lbl-nv-bebes">Bebés</label>
-                <select class="m-sel" id="nv-bebes" onchange="onNvCountSelect('nv-bebes')">
-                  <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option>
-                  <option value="__custom__">✏️ Outro…</option>
-                </select>
-                <input class="m-inp" type="number" min="0" id="nv-bebes-custom" style="display:none;margin-top:6px" placeholder="Nº" oninput="updateNovaPaxSummary()">
-              </div>
-              <div class="m-field"><label id="lbl-nv-cadeira-rodas">Cadeira de rodas</label>
-                <select class="m-sel" id="nv-cadeira-rodas" onchange="onNvCountSelect('nv-cadeira-rodas')">
-                  <option value="0">0</option><option value="1">1</option><option value="2">2</option>
-                  <option value="__custom__">✏️ Outro…</option>
-                </select>
-                <input class="m-inp" type="number" min="0" id="nv-cadeira-rodas-custom" style="display:none;margin-top:6px" placeholder="Nº" oninput="updateNovaPaxSummary()">
-              </div>
-              <div class="m-field"><label id="lbl-nv-cadeira-bebe">Cadeira auto bebé</label>
-                <select class="m-sel" id="nv-cadeira-bebe" onchange="onNvCountSelect('nv-cadeira-bebe')">
-                  <option value="0">0</option><option value="1">1</option><option value="2">2</option>
-                  <option value="__custom__">✏️ Outro…</option>
-                </select>
-                <input class="m-inp" type="number" min="0" id="nv-cadeira-bebe-custom" style="display:none;margin-top:6px" placeholder="Nº" oninput="updateNovaPaxSummary()">
-              </div>
-              <div class="m-field"><label id="lbl-nv-malas-grandes">Malas grandes</label>
-                <select class="m-sel" id="nv-malas-grandes" onchange="onNvCountSelect('nv-malas-grandes')">
-                  <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option>
-                  <option value="4">4</option><option value="5">5</option><option value="6">6</option>
-                  <option value="__custom__">✏️ Outro…</option>
-                </select>
-                <input class="m-inp" type="number" min="0" id="nv-malas-grandes-custom" style="display:none;margin-top:6px" placeholder="Nº" oninput="updateNovaPaxSummary()">
-              </div>
-              <div class="m-field"><label id="lbl-nv-mochilas">Mochilas</label>
-                <select class="m-sel" id="nv-mochilas" onchange="onNvCountSelect('nv-mochilas')">
-                  <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option>
-                  <option value="4">4</option><option value="5">5</option>
-                  <option value="__custom__">✏️ Outro…</option>
-                </select>
-                <input class="m-inp" type="number" min="0" id="nv-mochilas-custom" style="display:none;margin-top:6px" placeholder="Nº" oninput="updateNovaPaxSummary()">
-              </div>
-              <div class="m-field full"><div class="nova-pax-summary" id="nv-pax-summary">Total pax: 1 · Total bagagens: 0</div></div>
-
-              <div class="nova-sec-sep" id="lbl-nv-sec-transfer">🚗 Transfer</div>
-              <div class="m-field"><label id="lbl-nv-origem">Origem do Transfer</label>
+              <div class="nova-sec-sep" id="lbl-nv-sec-transfer">Transfer</div>
+              <div class="m-field" style="display:none"><label id="lbl-nv-origem">Origem</label>
                 <select class="m-sel" id="nv-origem" onchange="applyHotelOrigDefaults()">
-                  <option value="airport" id="nv-o-airport">✈ Aeroporto</option>
-                  <option value="hotel" id="nv-o-hotel" selected>🏨 Hotel</option>
-                  <option value="bus" id="nv-o-bus">🚌 Autocarro</option>
-                  <option value="train" id="nv-o-train">🚂 Comboio</option>
-                  <option value="highspeed" id="nv-o-highspeed">🚄 Alta Velocidade</option>
+                  <option value="airport" id="nv-o-airport">Aeroporto</option>
+                  <option value="hotel" id="nv-o-hotel" selected>Hotel</option>
+                  <option value="bus" id="nv-o-bus">Autocarro</option>
+                  <option value="train" id="nv-o-train">Comboio</option>
+                  <option value="highspeed" id="nv-o-highspeed">Alta Velocidade</option>
                 </select>
               </div>
-              <div class="m-field"><label id="lbl-nv-data">Data do Transfer *</label><input class="m-inp" type="date" id="nv-data"></div>
-              <div class="m-field"><label id="lbl-nv-hora">Hora do Transfer *</label><input class="m-inp" type="time" id="nv-hora"></div>
-              <div class="m-field"><label id="lbl-nv-partida">Ponto de Partida *</label>
+              <div class="m-field"><label id="lbl-nv-data">Data *</label><input class="m-inp" type="date" id="nv-data"></div>
+              <div class="m-field"><label id="lbl-nv-hora">Hora *</label><input class="m-inp" type="time" id="nv-hora"></div>
+              <div class="m-field"><label id="lbl-nv-partida">Partida *</label>
                 <select class="m-sel" id="nv-partida-sel" onchange="onNvLieuChange('depart')"></select>
                 <input class="m-inp" type="text" id="nv-partida-custom" style="display:none;margin-top:6px" placeholder="Nome do lugar…">
-              </div>
-              <div class="m-field"><label><span id="lbl-nv-end-partida">Morada de Partida</span> <span id="nv-addr-dep-req" style="font-size:10px;color:var(--ts)">(opt.)</span></label>
-                <input class="m-inp" type="text" id="nv-end-partida" placeholder="Rua, nº…">
               </div>
               <div class="m-field"><label id="lbl-nv-destino">Destino *</label>
                 <select class="m-sel" id="nv-destino-sel" onchange="onNvLieuChange('dest')"></select>
                 <input class="m-inp" type="text" id="nv-destino-custom" style="display:none;margin-top:6px" placeholder="Nome do lugar…">
               </div>
-              <div class="m-field"><label><span id="lbl-nv-end-destino">Morada de Destino</span> <span id="nv-addr-dest-req" style="font-size:10px;color:var(--ts)">(opt.)</span></label>
-                <input class="m-inp" type="text" id="nv-end-destino" placeholder="Rua, nº…">
+              <div class="nova-sense" id="nv-sense-box">
+                <span class="nova-sense-pill unk" id="nv-sense-pill">—</span>
+                <span class="nova-sense-txt" id="nv-sense-txt"></span>
+              </div>
+              <div class="m-field"><label id="lbl-nv-adultos">Adultos *</label>
+                <select class="m-sel" id="nv-adultos" onchange="onNvCountSelect('nv-adultos')">
+                  <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                  <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                  <option value="__custom__">Outro…</option>
+                </select>
+                <input class="m-inp" type="number" min="1" id="nv-adultos-custom" style="display:none;margin-top:6px" placeholder="Nº" oninput="updateNovaPaxSummary()">
               </div>
 
-              <div class="nova-sec-sep" id="lbl-nv-sec-extra">📝 Complementos</div>
-              <div class="m-field"><label id="lbl-nv-voo">Nº Voo</label><input class="m-inp" type="text" id="nv-voo"></div>
-              <div class="m-field"><label id="lbl-nv-quarto">Nº Quarto</label><input class="m-inp" type="text" id="nv-quarto"></div>
-              <div class="m-field full"><label id="lbl-nv-com">Comentário (opcional)</label><textarea class="m-ta" id="nv-com" rows="2"></textarea></div>
+              <div class="nova-sec-sep" id="lbl-nv-sec-extra">Complementos</div>
+              <div class="m-field"><label id="lbl-nv-prix">Preço (€)</label><input class="m-inp" type="number" min="0" step="0.01" id="nv-prix" placeholder="0.00"></div>
+              <div class="m-field"><label id="lbl-nv-voo">Nº voo / transporte <span id="nv-voo-flag" style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ts)">(opcional)</span></label><input class="m-inp" type="text" id="nv-voo"></div>
+              <div class="m-field"><label id="lbl-nv-quarto">Nº Quarto <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ts)">(opcional)</span></label><input class="m-inp" type="text" id="nv-quarto"></div>
+              <div class="m-field full"><label id="lbl-nv-com">Comentário <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ts)">(opcional)</span></label><textarea class="m-ta" id="nv-com" rows="2"></textarea></div>
+
+              <div class="nova-opts" id="nv-opts" aria-hidden="true">
+                <div class="nova-opts-hd">
+                  <strong id="lbl-nv-opts-ttl">Mais opções</strong>
+                  <button type="button" class="btn btn-ghost btn-sm" onclick="toggleNvOpts(false)">Fechar</button>
+                </div>
+                <div class="m-field"><label id="lbl-nv-ota">Ref. OTA / Reserva</label><input class="m-inp" type="text" id="nv-ota"></div>
+                <div class="m-field"><label id="lbl-nv-bebes">Bebés</label>
+                  <select class="m-sel" id="nv-bebes" onchange="onNvCountSelect('nv-bebes')">
+                    <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                    <option value="__custom__">Outro…</option>
+                  </select>
+                  <input class="m-inp" type="number" min="0" id="nv-bebes-custom" style="display:none;margin-top:6px" placeholder="Nº" oninput="updateNovaPaxSummary()">
+                </div>
+                <div class="m-field"><label id="lbl-nv-malas-grandes">Malas grandes</label>
+                  <select class="m-sel" id="nv-malas-grandes" onchange="onNvCountSelect('nv-malas-grandes')">
+                    <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                    <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+                    <option value="__custom__">Outro…</option>
+                  </select>
+                  <input class="m-inp" type="number" min="0" id="nv-malas-grandes-custom" style="display:none;margin-top:6px" placeholder="Nº" oninput="updateNovaPaxSummary()">
+                </div>
+                <div class="m-field"><label id="lbl-nv-mochilas">Mochilas</label>
+                  <select class="m-sel" id="nv-mochilas" onchange="onNvCountSelect('nv-mochilas')">
+                    <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                    <option value="4">4</option><option value="5">5</option>
+                    <option value="__custom__">Outro…</option>
+                  </select>
+                  <input class="m-inp" type="number" min="0" id="nv-mochilas-custom" style="display:none;margin-top:6px" placeholder="Nº" oninput="updateNovaPaxSummary()">
+                </div>
+                <div class="m-field"><label id="lbl-nv-cadeira-rodas">Cadeira de rodas</label>
+                  <select class="m-sel" id="nv-cadeira-rodas" onchange="onNvCountSelect('nv-cadeira-rodas')">
+                    <option value="0">0</option><option value="1">1</option><option value="2">2</option>
+                    <option value="__custom__">Outro…</option>
+                  </select>
+                  <input class="m-inp" type="number" min="0" id="nv-cadeira-rodas-custom" style="display:none;margin-top:6px" placeholder="Nº" oninput="updateNovaPaxSummary()">
+                </div>
+                <div class="m-field"><label id="lbl-nv-cadeira-bebe">Cadeira auto bebé</label>
+                  <select class="m-sel" id="nv-cadeira-bebe" onchange="onNvCountSelect('nv-cadeira-bebe')">
+                    <option value="0">0</option><option value="1">1</option><option value="2">2</option>
+                    <option value="__custom__">Outro…</option>
+                  </select>
+                  <input class="m-inp" type="number" min="0" id="nv-cadeira-bebe-custom" style="display:none;margin-top:6px" placeholder="Nº" oninput="updateNovaPaxSummary()">
+                </div>
+                <div class="m-field full"><div class="nova-pax-summary" id="nv-pax-summary">Total pax: 1 · Total bagagens: 0</div></div>
+                <div class="m-field"><label><span id="lbl-nv-end-partida">Morada de Partida</span> <span id="nv-addr-dep-req" style="font-size:10px;color:var(--ts)">(opt.)</span></label>
+                  <input class="m-inp" type="text" id="nv-end-partida" placeholder="Rua, nº…">
+                </div>
+                <div class="m-field"><label><span id="lbl-nv-end-destino">Morada de Destino</span> <span id="nv-addr-dest-req" style="font-size:10px;color:var(--ts)">(opt.)</span></label>
+                  <input class="m-inp" type="text" id="nv-end-destino" placeholder="Rua, nº…">
+                </div>
+                <div class="nova-sec-sep" id="lbl-nv-sec-pax" style="display:none">Passageiros</div>
+              </div>
             </div>
           </div>
           <div class="nova-actions">
+            <button class="btn btn-ghost btn-sm" type="button" id="btn-nv-opts" onclick="toggleNvOpts()">Mais opções</button>
             <button class="btn btn-ghost btn-sm" type="button" onclick="resetNovaForm()" id="lbl-nv-clear">Limpar</button>
             <button class="btn btn-navy btn-sm" type="button" onclick="submitNovaReserva()" id="btn-nv-submit">💾 <span id="lbl-nv-submit">Guardar</span></button>
           </div>
@@ -1938,7 +1966,14 @@ function setLang(lang, zone){
   s('lbl-nv-agency-hint',T.nvAgencyHint||''); s('lbl-nv-flow-hint',T.nvFlowHint||'');
   s('lbl-nv-sec-client',T.nvSecClient||'👤 Cliente'); s('lbl-nv-sec-pax',T.nvSecPax||'👥 Passageiros');
   s('lbl-nv-sec-transfer',T.nvSecTransfer||'🚗 Transfer'); s('lbl-nv-sec-extra',T.nvSecExtra||'📝 Complementos');
-  s('lbl-nv-nom',T.nvNom); s('lbl-nv-email',T.nvEmail); s('lbl-nv-tel',T.nvTel); s('lbl-nv-ota',T.nvOta);
+  s('lbl-nv-nom',T.nvNom); s('lbl-nv-tel',T.nvTel); s('lbl-nv-ota',T.nvOta);
+  {
+    const emailLab=document.getElementById('lbl-nv-email');
+    if(emailLab){
+      const base=(T.nvEmail||'Email').replace(/\s*\*\s*$/,'').trim();
+      emailLab.innerHTML=base+' <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ts)">(opcional)</span>';
+    }
+  }
   s('lbl-nv-origem',T.nvOrigem); s('lbl-nv-data',T.nvData); s('lbl-nv-hora',T.nvHora);
   s('lbl-nv-adultos',T.nvAdultos); s('lbl-nv-bebes',T.nvBebes);
   s('lbl-nv-cadeira-rodas',T.nvCadeiraRodas); s('lbl-nv-cadeira-bebe',T.nvCadeiraBebe);
@@ -3185,9 +3220,11 @@ function renderNovaLock(){
 }
 
 function resetNovaForm(){
-  ['nv-nom','nv-email','nv-tel','nv-ota','nv-end-partida','nv-end-destino','nv-voo','nv-quarto','nv-com','nv-partida-custom','nv-destino-custom'].forEach(id => {
+  ['nv-nom','nv-email','nv-tel','nv-ota','nv-end-partida','nv-end-destino','nv-voo','nv-quarto','nv-com','nv-partida-custom','nv-destino-custom','nv-prix'].forEach(id => {
     const e = document.getElementById(id); if(e) e.value = '';
   });
+  const vooEl = document.getElementById('nv-voo'); if(vooEl) vooEl.classList.remove('need');
+  try{ toggleNvOpts(false); }catch(e){}
   const setSel = (id, v) => {
     const e = document.getElementById(id); if(e) e.value = v;
     const c = document.getElementById(id + '-custom'); if(c){ c.value = ''; c.style.display = 'none'; }
@@ -3207,6 +3244,7 @@ function resetNovaForm(){
   applyHotelOrigDefaults();
   APP._novaDefaultsApplied=true;
   updateNovaPaxSummary();
+  try{ updateNvSenseUi_(); }catch(e){}
 }
 
 function onNvCountSelect(baseId){
@@ -3548,7 +3586,80 @@ function onNvLieuChange(which){
     req.textContent = isCustom ? '* obrig.' : '(opt.)';
     req.style.color = isCustom ? 'var(--danger,#c0392b)' : 'var(--ts)';
   }
+  updateNvSenseUi_();
   scheduleNvRouteMap();
+}
+
+function inferNvLieuKind_(nom){
+  const n = String(nom||'').toLowerCase();
+  if(!n) return '';
+  const lieu = (APP.lieux||[]).find(l => String(l.nom||'').toLowerCase() === n);
+  if(lieu){
+    const t = String(lieu.typeLieu || lieu.kind || lieu.categorie || lieu.type || '').toLowerCase();
+    if(/airport|aeroporto/.test(t)) return 'airport';
+    if(/train|comboio|gare|estação|estacao/.test(t)) return 'train';
+    if(/bus|autocarro|terminal/.test(t)) return 'bus';
+    if(/high|alta/.test(t)) return 'highspeed';
+    if(/hotel/.test(t)) return 'hotel';
+    if(/city|cidade|lugar|local|poi/.test(t)) return 'city';
+  }
+  if(/airport|aeroporto|\blis\b/.test(n)) return 'airport';
+  if(/oriente|apol[oó]nia|estação|estacao|comboio|train|gare/.test(n)) return 'train';
+  if(/sete rios|bus|terminal|autocarro/.test(n)) return 'bus';
+  if(/alta velocidade|high.?speed|alfa/.test(n)) return 'highspeed';
+  const hotel = (APP.agencyNom||'').trim().toLowerCase();
+  if(hotel && n === hotel) return 'hotel';
+  if(/hotel/.test(n)) return 'hotel';
+  return 'city';
+}
+
+function detectNvSense_(){
+  const dep = getNvLieuValue('depart');
+  const dest = getNvLieuValue('dest');
+  if(!dep || !dest) return { code:'unk', label:'—', txt:'', origine:'hotel' };
+  if(dep === dest) return { code:'unk', label:'?', txt:'', origine:'hotel' };
+  const dk = inferNvLieuKind_(dep);
+  const tk = inferNvLieuKind_(dest);
+  const hub = { airport:1, train:1, bus:1, highspeed:1 };
+  if(hub[dk] && tk === 'hotel'){
+    return { code:'in', label:'Chegada · IN', txt: dep + ' → ' + dest, origine: dk };
+  }
+  if(dk === 'hotel' && hub[tk]){
+    return { code:'out', label:'Partida · OUT', txt: dep + ' → ' + dest, origine: 'hotel' };
+  }
+  return { code:'local', label:'Interno · LOCAL', txt: dep + ' → ' + dest, origine: hub[dk] ? dk : (hub[tk] ? tk : 'hotel') };
+}
+
+function updateNvSenseUi_(){
+  const s = detectNvSense_();
+  const pill = document.getElementById('nv-sense-pill');
+  const txt = document.getElementById('nv-sense-txt');
+  const flag = document.getElementById('nv-voo-flag');
+  const orig = document.getElementById('nv-origem');
+  if(pill){ pill.className = 'nova-sense-pill ' + s.code; pill.textContent = s.label; }
+  if(txt) txt.textContent = s.txt || '';
+  if(flag){
+    if(s.code === 'in'){ flag.textContent = '*'; flag.style.color = '#B45309'; }
+    else { flag.textContent = '(opcional)'; flag.style.color = 'var(--ts)'; }
+  }
+  if(orig && s.origine){
+    if([...orig.options].some(o => o.value === s.origine)) orig.value = s.origine;
+  }
+  const prix = document.getElementById('nv-prix');
+  if(prix && !String(prix.value||'').trim()){
+    prix.placeholder = s.code === 'out' ? '25' : (s.code === 'in' ? '35' : '0.00');
+  }
+}
+
+function toggleNvOpts(force){
+  const panel = document.getElementById('nv-opts');
+  const btn = document.getElementById('btn-nv-opts');
+  const open = force === undefined ? !(panel && panel.classList.contains('open')) : !!force;
+  if(panel){
+    panel.classList.toggle('open', open);
+    panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+  }
+  if(btn) btn.textContent = open ? 'Ocultar opções' : 'Mais opções';
 }
 
 function getNvLieuValue(which){
@@ -3641,8 +3752,20 @@ async function submitNovaReserva(){
   const destCustom = document.getElementById('nv-destino-sel')?.value === '__custom__';
   const adresseDepart = val('nv-end-partida');
   const adresseDestination = val('nv-end-destino');
-  if(!nom || !email || !tel || !data || !hora){
+  if(!nom || !tel || !data || !hora){
     novaMsg(T2.nvErrRequired, 'error');
+    return;
+  }
+  if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    novaMsg(T2.nvErrEmail, 'error');
+    return;
+  }
+  const sense = detectNvSense_();
+  const vooEl = document.getElementById('nv-voo');
+  if(vooEl) vooEl.classList.remove('need');
+  if(sense.code === 'in' && !val('nv-voo')){
+    if(vooEl) vooEl.classList.add('need');
+    novaMsg(T2.nvErrVooIn || 'Chegada: indique o nº de voo / transporte.', 'error');
     return;
   }
   if(hotelCreateDateTimePast_(data, hora)){
@@ -3663,10 +3786,6 @@ async function submitNovaReserva(){
   }
   if(destCustom && !adresseDestination){
     novaMsg(T2.nvErrAddrDest || '⚠️ Morada de destino obrigatória quando o lugar não está na lista', 'error');
-    return;
-  }
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    novaMsg(T2.nvErrEmail, 'error');
     return;
   }
   const personnes = String(adultos + bebes);
@@ -3692,7 +3811,11 @@ async function submitNovaReserva(){
       dateTransfer: data, heureTransfer: hora,
       numVol: val('nv-voo'), numChambre: val('nv-quarto'),
       commentaires: val('nv-com'),
-      prixFinal: String((val('nv-origem') === 'hotel') ? 25 : 35)
+      prixFinal: (()=>{
+        const px = val('nv-prix');
+        if(px !== '') return px;
+        return String((sense.code === 'out' || val('nv-origem') === 'hotel') ? 25 : 35);
+      })()
     };
     const d = await api(payload);
     if(d.success){
