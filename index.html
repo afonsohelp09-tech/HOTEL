@@ -387,6 +387,10 @@ html[data-theme="dark"] .acts-dd-menu{background:var(--surface);box-shadow:0 10p
 .nova-opts-hd{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
 .nova-opts-hd strong{font-size:13px;color:var(--navy)}
 .m-inp.need{border-color:#F59E0B;background:#FFFBEB}
+.m-ex{font-size:11px;color:var(--ts);margin-top:5px;line-height:1.35;word-break:break-word}
+.nv-addr-inline{display:none;margin-top:8px}
+.nv-addr-inline.show{display:block}
+.nv-addr-inline label{display:block;font-size:11px;font-weight:600;color:var(--tm);margin-bottom:5px}
 html[data-theme="dark"] .nova-sense{background:var(--surface);border-color:var(--border)}
 html[data-theme="dark"] .nova-opts{background:var(--surface);border-color:var(--border)}
 .nova-actions{padding:16px 20px;border-top:1px solid var(--border2);background:var(--surface);display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
@@ -1348,10 +1352,20 @@ body{font-size:clamp(13px,1.4vw + 10px,15px)}
               <div class="m-field"><label id="lbl-nv-partida">Partida *</label>
                 <select class="m-sel" id="nv-partida-sel" onchange="onNvLieuChange('depart')"></select>
                 <input class="m-inp" type="text" id="nv-partida-custom" style="display:none;margin-top:6px" placeholder="Nome do lugar…">
+                <div class="nv-addr-inline" id="nv-addr-dep-wrap">
+                  <label><span id="lbl-nv-end-partida">Morada de Partida</span> <span id="nv-addr-dep-req" style="font-size:10px;color:var(--danger,#c0392b)">* obrig.</span></label>
+                  <input class="m-inp" type="text" id="nv-end-partida" placeholder="Rua, nº, cidade…">
+                  <div class="m-ex">ex.: Av. da Liberdade 100, Lisboa</div>
+                </div>
               </div>
               <div class="m-field"><label id="lbl-nv-destino">Destino *</label>
                 <select class="m-sel" id="nv-destino-sel" onchange="onNvLieuChange('dest')"></select>
                 <input class="m-inp" type="text" id="nv-destino-custom" style="display:none;margin-top:6px" placeholder="Nome do lugar…">
+                <div class="nv-addr-inline" id="nv-addr-dest-wrap">
+                  <label><span id="lbl-nv-end-destino">Morada de Destino</span> <span id="nv-addr-dest-req" style="font-size:10px;color:var(--danger,#c0392b)">* obrig.</span></label>
+                  <input class="m-inp" type="text" id="nv-end-destino" placeholder="Rua, nº, cidade…">
+                  <div class="m-ex">ex.: Rua Augusta 10, Lisboa</div>
+                </div>
               </div>
               <div class="nova-sense" id="nv-sense-box">
                 <span class="nova-sense-pill unk" id="nv-sense-pill">—</span>
@@ -1368,7 +1382,7 @@ body{font-size:clamp(13px,1.4vw + 10px,15px)}
 
               <div class="nova-sec-sep" id="lbl-nv-sec-extra">Complementos</div>
               <div class="m-field"><label id="lbl-nv-prix">Preço (€)</label><input class="m-inp" type="number" min="0" step="0.01" id="nv-prix" placeholder="0.00"></div>
-              <div class="m-field"><label id="lbl-nv-voo">Nº voo / transporte <span id="nv-voo-flag" style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ts)">(opcional)</span></label><input class="m-inp" type="text" id="nv-voo"></div>
+              <div class="m-field"><label id="lbl-nv-voo">Nº voo / transporte <span id="nv-voo-flag" style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ts)">(opcional)</span></label><input class="m-inp" type="text" id="nv-voo" placeholder="TP1234"><div class="m-ex" id="nv-voo-ex">ex.: TP1234 (voo) · IC712 (comboio) · FLIXBUS-ABC</div></div>
               <div class="m-field"><label id="lbl-nv-quarto">Nº Quarto <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ts)">(opcional)</span></label><input class="m-inp" type="text" id="nv-quarto"></div>
               <div class="m-field full"><label id="lbl-nv-com">Comentário <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ts)">(opcional)</span></label><textarea class="m-ta" id="nv-com" rows="2"></textarea></div>
 
@@ -1416,12 +1430,6 @@ body{font-size:clamp(13px,1.4vw + 10px,15px)}
                   <input class="m-inp" type="number" min="0" id="nv-cadeira-bebe-custom" style="display:none;margin-top:6px" placeholder="Nº" oninput="updateNovaPaxSummary()">
                 </div>
                 <div class="m-field full"><div class="nova-pax-summary" id="nv-pax-summary">Total pax: 1 · Total bagagens: 0</div></div>
-                <div class="m-field"><label><span id="lbl-nv-end-partida">Morada de Partida</span> <span id="nv-addr-dep-req" style="font-size:10px;color:var(--ts)">(opt.)</span></label>
-                  <input class="m-inp" type="text" id="nv-end-partida" placeholder="Rua, nº…">
-                </div>
-                <div class="m-field"><label><span id="lbl-nv-end-destino">Morada de Destino</span> <span id="nv-addr-dest-req" style="font-size:10px;color:var(--ts)">(opt.)</span></label>
-                  <input class="m-inp" type="text" id="nv-end-destino" placeholder="Rua, nº…">
-                </div>
                 <div class="nova-sec-sep" id="lbl-nv-sec-pax" style="display:none">Passageiros</div>
               </div>
             </div>
@@ -3567,6 +3575,7 @@ function onNvLieuChange(which){
   const sel = document.getElementById(isDep ? 'nv-partida-sel' : 'nv-destino-sel');
   const custom = document.getElementById(isDep ? 'nv-partida-custom' : 'nv-destino-custom');
   const addr = document.getElementById(isDep ? 'nv-end-partida' : 'nv-end-destino');
+  const wrap = document.getElementById(isDep ? 'nv-addr-dep-wrap' : 'nv-addr-dest-wrap');
   const req = document.getElementById(isDep ? 'nv-addr-dep-req' : 'nv-addr-dest-req');
   if(!sel) return;
   const isCustom = sel.value === '__custom__';
@@ -3574,9 +3583,12 @@ function onNvLieuChange(which){
     custom.style.display = isCustom ? '' : 'none';
     if(!isCustom) custom.value = '';
   }
+  if(wrap) wrap.classList.toggle('show', isCustom);
+  if(addr) addr.classList.remove('need');
+  if(!isCustom && addr) addr.value = '';
   const opt = sel.selectedOptions && sel.selectedOptions[0];
   const preAdr = opt ? (opt.getAttribute('data-adresse') || '') : '';
-  if(!isCustom && addr && preAdr && !addr.value) addr.value = preAdr;
+  if(!isCustom && addr && preAdr) addr.value = preAdr;
   // Hotel sélectionné → forcer morada de la fiche si vide
   const hotel = (APP.agencyNom||'').trim();
   if(!isCustom && hotel && sel.value === hotel && APP.hotelAdresse && addr && !addr.value){
@@ -3764,7 +3776,7 @@ async function submitNovaReserva(){
   const vooEl = document.getElementById('nv-voo');
   if(vooEl) vooEl.classList.remove('need');
   if(sense.code === 'in' && !val('nv-voo')){
-    if(vooEl) vooEl.classList.add('need');
+    if(vooEl){ vooEl.classList.add('need'); try{ vooEl.focus({preventScroll:false}); vooEl.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} }
     novaMsg(T2.nvErrVooIn || 'Chegada: indique o nº de voo / transporte.', 'error');
     return;
   }
@@ -3781,10 +3793,14 @@ async function submitNovaReserva(){
     return;
   }
   if(depCustom && !adresseDepart){
+    const a = document.getElementById('nv-end-partida');
+    if(a){ a.classList.add('need'); try{ a.focus(); a.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} }
     novaMsg(T2.nvErrAddrDep || '⚠️ Morada de partida obrigatória quando o lugar não está na lista', 'error');
     return;
   }
   if(destCustom && !adresseDestination){
+    const a = document.getElementById('nv-end-destino');
+    if(a){ a.classList.add('need'); try{ a.focus(); a.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} }
     novaMsg(T2.nvErrAddrDest || '⚠️ Morada de destino obrigatória quando o lugar não está na lista', 'error');
     return;
   }
