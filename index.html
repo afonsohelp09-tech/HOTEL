@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#EEF2F7">
 <script>
 (function(){try{if(localStorage.getItem('nlp_agency_theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();
-(function(){try{var s=localStorage.getItem('nlp_agency_text_size');document.documentElement.setAttribute('data-text-size',s==='md'?'md':'sm');}catch(e){document.documentElement.setAttribute('data-text-size','sm');}})();
+(function(){try{var s=localStorage.getItem('nlp_agency_text_size');document.documentElement.setAttribute('data-text-size',(s==='md'||s==='lg')?s:'sm';}catch(e){document.documentElement.setAttribute('data-text-size','sm');}})();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
@@ -585,8 +585,9 @@ html[data-theme="dark"] .header .lang-app .lp.active{
 
 /* ══ Téléphone / petit écran — lisibilité + cibles tactiles (min ~44px) ══ */
 @media(max-width:768px){
-  html{--m-fs:14px;--m-title:1.125rem;--m-card:.9375rem;--m-meta:.8125rem;--m-h1:1.3125rem;--m-h2:1.125rem;--m-h3:1rem;--m-stat:1.25rem}
-  html[data-text-size="md"]{--m-fs:16px;--m-title:1.375rem;--m-card:1rem;--m-meta:.875rem;--m-h1:1.5rem;--m-h2:1.25rem;--m-h3:1.0625rem;--m-stat:1.5rem}
+  html{--m-fs:12.5px;--m-title:1rem;--m-card:.8125rem;--m-meta:.75rem;--m-h1:1.125rem;--m-h2:1rem;--m-h3:.9375rem;--m-stat:1.125rem}
+  html[data-text-size="md"]{--m-fs:14px;--m-title:1.125rem;--m-card:.9375rem;--m-meta:.8125rem;--m-h1:1.3125rem;--m-h2:1.125rem;--m-h3:1rem;--m-stat:1.25rem}
+  html[data-text-size="lg"]{--m-fs:16px;--m-title:1.375rem;--m-card:1rem;--m-meta:.875rem;--m-h1:1.5rem;--m-h2:1.25rem;--m-h3:1.0625rem;--m-stat:1.5rem}
   body{font-size:var(--m-fs)}
   #app-screen,#login-screen{padding-left:max(0px, env(safe-area-inset-left));padding-right:max(0px, env(safe-area-inset-right))}
   /* Espace sous les boutons thème (coin) pour ne pas recouvrir la liste langue */
@@ -1116,12 +1117,13 @@ html[data-theme="dark"] .disp-btn.on,html[data-theme="dark"] .disp-btn[aria-pres
   </div>
   <div class="display-prefs" role="region" aria-label="Affichage">
     <div class="disp-seg" role="group" aria-label="Thème">
-      <button type="button" class="disp-btn theme-btn" data-theme-pick="light" aria-pressed="true" title="Clair">Clair</button>
-      <button type="button" class="disp-btn theme-btn" data-theme-pick="dark" aria-pressed="false" title="Foncé">Foncé</button>
+      <button type="button" class="disp-btn theme-btn" data-theme-pick="light" aria-pressed="true" title="Clair">☀️ Clair</button>
+      <button type="button" class="disp-btn theme-btn" data-theme-pick="dark" aria-pressed="false" title="Foncé">🌙 Foncé</button>
     </div>
     <div class="disp-seg" role="group" aria-label="Taille du texte">
       <button type="button" class="disp-btn on" data-text-size-pick="sm" aria-pressed="true">Petite</button>
       <button type="button" class="disp-btn" data-text-size-pick="md" aria-pressed="false">Moyenne</button>
+      <button type="button" class="disp-btn" data-text-size-pick="lg" aria-pressed="false">Grand</button>
     </div>
   </div>
   <div class="theme-corner-login">
@@ -1240,12 +1242,13 @@ html[data-theme="dark"] .disp-btn.on,html[data-theme="dark"] .disp-btn[aria-pres
   </div>
   <div class="display-prefs" role="region" aria-label="Affichage">
     <div class="disp-seg" role="group" aria-label="Thème">
-      <button type="button" class="disp-btn theme-btn" data-theme-pick="light" aria-pressed="true" title="Clair">Clair</button>
-      <button type="button" class="disp-btn theme-btn" data-theme-pick="dark" aria-pressed="false" title="Foncé">Foncé</button>
+      <button type="button" class="disp-btn theme-btn" data-theme-pick="light" aria-pressed="true" title="Clair">☀️ Clair</button>
+      <button type="button" class="disp-btn theme-btn" data-theme-pick="dark" aria-pressed="false" title="Foncé">🌙 Foncé</button>
     </div>
     <div class="disp-seg" role="group" aria-label="Taille du texte">
       <button type="button" class="disp-btn on" data-text-size-pick="sm" aria-pressed="true">Petite</button>
       <button type="button" class="disp-btn" data-text-size-pick="md" aria-pressed="false">Moyenne</button>
+      <button type="button" class="disp-btn" data-text-size-pick="lg" aria-pressed="false">Grand</button>
     </div>
   </div>
 
@@ -4199,20 +4202,18 @@ document.addEventListener('keydown', e => {
   setAgencyTheme((function(){try{return localStorage.getItem(KEY)==='dark'?'dark':'light';}catch(e){return'light';}})());
   var SIZE_KEY='nlp_agency_text_size';
   function setTextSize(mode){
-    var md=mode==='md';
-    document.documentElement.setAttribute('data-text-size',md?'md':'sm');
-    try{localStorage.setItem(SIZE_KEY,md?'md':'sm');}catch(e){}
-    document.querySelectorAll('[data-text-size-pick="sm"]').forEach(function(b){
-      b.classList.toggle('on',!md);b.setAttribute('aria-pressed',!md?'true':'false');
-    });
-    document.querySelectorAll('[data-text-size-pick="md"]').forEach(function(b){
-      b.classList.toggle('on',md);b.setAttribute('aria-pressed',md?'true':'false');
+    var sz=(mode==='md'||mode==='lg')?mode:'sm';
+    document.documentElement.setAttribute('data-text-size',sz);
+    try{localStorage.setItem(SIZE_KEY,sz);}catch(e){}
+    document.querySelectorAll('[data-text-size-pick]').forEach(function(b){
+      var on=b.getAttribute('data-text-size-pick')===sz;
+      b.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false');
     });
   }
   document.querySelectorAll('[data-text-size-pick]').forEach(function(btn){
     btn.addEventListener('click',function(){setTextSize(this.getAttribute('data-text-size-pick'));});
   });
-  setTextSize((function(){try{return localStorage.getItem(SIZE_KEY)==='md'?'md':'sm';}catch(e){return'sm';}})());
+  setTextSize((function(){try{var s=localStorage.getItem(SIZE_KEY);return (s==='md'||s==='lg')?s:'sm';}catch(e){return'sm';}})());
 })();
 </script>
 
