@@ -592,114 +592,25 @@ html[data-theme="dark"] .header .lang-app .lp.active{
   #app-screen,#login-screen{padding-left:max(0px, env(safe-area-inset-left));padding-right:max(0px, env(safe-area-inset-right))}
   /* Espace sous les boutons thème (coin) pour ne pas recouvrir la liste langue */
   #login-screen{padding-top:max(44px, calc(env(safe-area-inset-top) + 28px));padding-bottom:max(12px, env(safe-area-inset-bottom))}
-  /* Langues : une liste déroulante (plus lisible que 4 boutons en ligne) */
+  /* Langues : 4 boutons en coin, comme sur PC */
   #login-screen .lang-top{
-    position:static;
-    top:auto;
-    right:auto;
-    width:100%;
-    max-width:420px;
-    margin:0 auto 14px;
-    padding:0 max(4px, env(safe-area-inset-left)) 0 max(4px, env(safe-area-inset-right));
-    display:block;
-  }
-  #login-screen .lang-top .lp{display:none!important;}
-  /* Liste langue : couleurs fixes (le thème foncé redéfinit --white/--navy et grisait tout) */
-  #login-screen .lang-top .lang-select-mobile{
-    display:block!important;
-    width:100%;
-    min-height:48px;
-    padding:12px 14px;
-    font-size:16px;
-    font-weight:700;
-    letter-spacing:.02em;
-    color:#0d2137!important;
-    border:2px solid #c9a84c!important;
-    border-radius:var(--r-lg);
-    box-shadow:0 6px 20px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.9);
-    -webkit-appearance:none;
-    appearance:none;
-    color-scheme:light;
-    background-color:#ffffff!important;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%231B4F72' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;
-    background-position:right 12px center;
-    background-size:20px 20px;
-    padding-right:42px!important;
-  }
-  #login-screen .lang-top .lang-select-mobile:focus{
-    outline:none;
-    border-color:#1b4f72!important;
-    box-shadow:0 0 0 3px rgba(201,168,76,.45),0 8px 24px rgba(0,0,0,.25);
-  }
-  #login-screen .lang-top .lang-select-mobile option{
-    background:#fff!important;
-    color:#0d2137!important;
-    font-weight:600;
-    padding:10px;
-  }
-  .header-right .lang-app .lp{display:none!important;}
-  .header-right .lang-app .lang-select-mobile{
-    display:block!important;
-    width:100%;
-    min-width:0;
-    max-width:100%;
-    min-height:44px;
-    padding:10px 12px;
-    font-size:16px;
-    font-weight:700;
-    letter-spacing:.02em;
-    color:#0d2137!important;
-    border:2px solid #c9a84c!important;
-    border-radius:var(--r-lg);
-    box-shadow:0 4px 14px rgba(0,0,0,.2),inset 0 1px 0 #fff;
-    -webkit-appearance:none;
-    appearance:none;
-    color-scheme:light;
-    background-color:#ffffff!important;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%230D2137' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;
-    background-position:right 10px center;
-    background-size:18px 18px;
-    padding-right:38px!important;
-  }
-  .header-right .lang-app .lang-select-mobile:focus{
-    outline:none;
-    border-color:#1b4f72!important;
-    box-shadow:0 0 0 3px rgba(201,168,76,.5),0 6px 18px rgba(0,0,0,.25);
-  }
-  .header-right .lang-app .lang-select-mobile option{
-    background:#fff!important;
-    color:#0d2137!important;
-    font-weight:600;
-  }
-  /* Thème foncé : ne pas appliquer --white/--text aux listes langue (inchangé visuellement) */
-  html[data-theme="dark"] #login-screen .lang-top .lang-select-mobile,
-  html[data-theme="dark"] .header-right .lang-app .lang-select-mobile{
-    background-color:#ffffff!important;
-    color:#0d2137!important;
-    border-color:#d4b55c!important;
-  }
-  html[data-theme="dark"] #login-screen .lang-top .lang-select-mobile option,
-  html[data-theme="dark"] .header-right .lang-app .lang-select-mobile option{
-    background:#ffffff!important;
-    color:#0d2137!important;
-  }
-  /* Langue + Sair visibles ensemble : 2e ligne pleine largeur en grille (plus de scroll horizontal masquant Sair) */
-  .header-right .lang-app{
+    position:absolute;
+    top:max(10px, env(safe-area-inset-top));
+    right:max(10px, env(safe-area-inset-right));
+    left:auto;
+    width:auto;
+    max-width:calc(100vw - 20px);
+    margin:0;
+    padding:0;
     display:flex;
+    flex-wrap:wrap;
+    justify-content:flex-end;
     align-items:center;
-    min-width:0;
-    width:100%;
-    max-width:none;
-    margin-inline-end:0;
-    padding:4px 6px;
-    background:#0d2137;
-    border-radius:14px;
-    box-shadow:0 0 0 1px rgba(201,168,76,.45);
-    position:relative;
-    z-index:1;
+    gap:6px;
+    z-index:370;
+    overflow:visible;
   }
+  #login-screen .lang-top .lp,#login-screen .lang-top .lang-select-mobile,.header-right .lang-app{display:none!important;}
   .theme-corner-login{top:max(12px, env(safe-area-inset-top));left:max(12px, env(safe-area-inset-left))}
   /* Thème ☀️ / 🌙 — cibles larges + espace (évite chevauchement au doigt) */
   #login-screen .theme-corner-login .theme-seg{
@@ -762,7 +673,7 @@ html[data-theme="dark"] .header .lang-app .lp.active{
   .header-left{min-width:0;flex:0 1 auto}
   .header-right{
     display:grid;
-    grid-template-columns:auto minmax(0,1fr) minmax(0,88px) auto;
+    grid-template-columns:auto auto minmax(0,88px) auto;
     align-items:center;
     gap:8px;
     width:100%;
@@ -986,6 +897,25 @@ body{font-size:clamp(13px,1.4vw + 10px,15px)}
   --safe-right:env(safe-area-inset-right,0px);
 }
 .display-prefs{display:none}
+.disp-menu-anchor{position:relative;flex-shrink:0;z-index:40}
+.disp-more-btn{width:36px;height:36px;border:1px solid rgba(255,255,255,.25);border-radius:8px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.92);font-size:22px;font-weight:700;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0 0 3px;font-family:Georgia,serif}
+.disp-more-btn:hover{border-color:var(--gold);color:var(--gold)}
+.disp-menu-pop{display:none!important;position:absolute;top:calc(100% + 8px);right:0;flex-direction:column;align-items:stretch;gap:10px;background:var(--white,#fff);border:1px solid var(--border,#D0DCE8);border-radius:12px;padding:12px;box-shadow:0 12px 32px rgba(13,33,55,.18);min-width:268px;z-index:400;box-sizing:border-box}
+.disp-menu-pop.open{display:flex!important}
+.disp-menu-pop .disp-seg{width:100%;justify-content:stretch;flex-wrap:wrap}
+.disp-menu-pop .disp-btn{flex:1;min-width:0}
+.disp-lang-block{display:flex;flex-direction:column;align-items:stretch;gap:6px}
+.disp-lang-lab{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ts,#64748b)}
+.disp-lang{width:100%;justify-content:stretch;flex-wrap:nowrap}
+.disp-lang .disp-btn{flex:1;min-width:0;text-align:center;padding-left:6px;padding-right:6px}
+html[data-theme="dark"] .disp-menu-pop{background:var(--surface,#1C2333);border-color:var(--border)}
+.theme-corner-login,.header .theme-row,.header-theme-inline,.lang-app,.lang-top .lp,.lang-select-mobile{display:none!important}
+@media(min-width:769px){
+  html[data-text-size="md"]{zoom:1.12;font-size:16px}
+  html[data-text-size="lg"]{zoom:1.25;font-size:18px}
+  html[data-text-size="md"] body{font-size:16px}
+  html[data-text-size="lg"] body{font-size:18px}
+}
 .disp-seg{display:inline-flex;align-items:center;background:rgba(13,33,55,.08);border:1px solid rgba(13,33,55,.16);border-radius:999px;padding:2px;gap:0}
 .disp-btn{appearance:none;border:none;background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--ts,#64748b);padding:7px 12px;border-radius:999px;min-height:36px;line-height:1.2;touch-action:manipulation;white-space:nowrap}
 .disp-btn.on,.disp-btn[aria-pressed="true"]{background:rgba(201,168,76,.22);color:#7a5a12;box-shadow:inset 0 0 0 1px var(--gold-b,rgba(201,168,76,.28))}
@@ -998,10 +928,13 @@ html[data-theme="dark"] .disp-btn.on,html[data-theme="dark"] .disp-btn[aria-pres
   .stat-val{font-size:var(--m-stat,1.25rem)!important}
   .m-card-client,.tl-client{font-size:var(--m-card,.9375rem)!important}
   .m-card-meta,.tl-route,.helper,.hotel-wa-desc{font-size:var(--m-meta,.8125rem)!important}
-  .display-prefs{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;width:100%;max-width:440px;margin:0 auto 12px;padding:0 12px;box-sizing:border-box;position:relative;z-index:13}
-  #app-screen .display-prefs{max-width:none;margin:0;padding:6px 12px 2px;justify-content:flex-start}
-  .theme-corner-login,.header .theme-row,.header-theme-inline{display:none!important}
-  .display-prefs .theme-btn,.display-prefs .disp-btn{min-width:auto!important;width:auto!important;height:auto!important;min-height:36px!important;font-size:12px!important;padding:7px 12px!important;line-height:1.2!important}
+  .tl-route{white-space:normal;overflow:visible;text-overflow:unset;line-height:1.35}
+  .disp-more-btn{min-width:44px;min-height:44px;width:44px;height:44px}
+  .header,.header-right,.disp-menu-anchor{overflow:visible}
+  .header{z-index:360}
+  .disp-menu-anchor{z-index:370}
+  #app-screen .disp-menu-pop{left:0;right:auto;min-width:0;width:min(300px,calc(100vw - 20px));max-width:calc(100vw - 20px);max-height:min(70dvh,calc(100dvh - 88px - env(safe-area-inset-bottom,0px)));overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .disp-menu-pop .disp-btn{min-width:auto!important;width:auto!important;height:auto!important;min-height:36px!important;font-size:12px!important;padding:7px 10px!important;line-height:1.2!important}
 }
 @media(max-width:640px){
   body{font-size:var(--m-fs,14px);line-height:1.45}
@@ -1108,22 +1041,34 @@ html[data-theme="dark"] .disp-btn.on,html[data-theme="dark"] .disp-btn[aria-pres
     <button type="button" class="lp" onclick="setLang('EN','login')">EN</button>
     <button type="button" class="lp" onclick="setLang('FR','login')">FR</button>
     <button type="button" class="lp" onclick="setLang('ES','login')">ES</button>
-    <select id="lang-login-sel" class="lang-select-mobile" aria-label="Idioma" onchange="setLang(this.value,'login')">
+        <select id="lang-login-sel" class="lang-select-mobile" aria-label="Idioma" onchange="setLang(this.value,'login')">
       <option value="PT">Português (PT)</option>
       <option value="EN">English (EN)</option>
       <option value="FR">Français (FR)</option>
       <option value="ES">Español (ES)</option>
     </select>
-  </div>
-  <div class="display-prefs" role="region" aria-label="Affichage">
-    <div class="disp-seg" role="group" aria-label="Thème">
-      <button type="button" class="disp-btn theme-btn" data-theme-pick="light" aria-pressed="true" title="Clair">☀️ Clair</button>
-      <button type="button" class="disp-btn theme-btn" data-theme-pick="dark" aria-pressed="false" title="Foncé">🌙 Foncé</button>
-    </div>
-    <div class="disp-seg" role="group" aria-label="Taille du texte">
-      <button type="button" class="disp-btn on" data-text-size-pick="sm" aria-pressed="true">Petite</button>
-      <button type="button" class="disp-btn" data-text-size-pick="md" aria-pressed="false">Moyenne</button>
-      <button type="button" class="disp-btn" data-text-size-pick="lg" aria-pressed="false">Grand</button>
+    <div class="disp-menu-anchor">
+      <button type="button" class="disp-more-btn" onclick="toggleDispMenu(event)" title="Affichage" aria-label="Affichage" aria-expanded="false">⋮</button>
+      <div class="display-prefs disp-menu-pop" role="dialog" aria-label="Affichage" onclick="event.stopPropagation()">
+        <div class="disp-seg" role="group" aria-label="Thème">
+          <button type="button" class="disp-btn theme-btn" data-theme-pick="light" aria-pressed="true" title="Clair">☀️ Clair</button>
+          <button type="button" class="disp-btn theme-btn" data-theme-pick="dark" aria-pressed="false" title="Foncé">🌙 Foncé</button>
+        </div>
+        <div class="disp-lang-block">
+          <div class="disp-lang-lab">Idioma</div>
+          <div class="disp-seg disp-lang" role="group" aria-label="Idioma">
+            <button type="button" class="disp-btn" data-lang-pick="PT" onclick="setLang('PT','login')">PT</button>
+            <button type="button" class="disp-btn" data-lang-pick="EN" onclick="setLang('EN','login')">EN</button>
+            <button type="button" class="disp-btn" data-lang-pick="FR" onclick="setLang('FR','login')">FR</button>
+            <button type="button" class="disp-btn" data-lang-pick="ES" onclick="setLang('ES','login')">ES</button>
+          </div>
+        </div>
+        <div class="disp-seg" role="group" aria-label="Taille du texte">
+          <button type="button" class="disp-btn on" data-text-size-pick="sm" aria-pressed="true">Petite</button>
+          <button type="button" class="disp-btn" data-text-size-pick="md" aria-pressed="false">Moyenne</button>
+          <button type="button" class="disp-btn" data-text-size-pick="lg" aria-pressed="false">Grand</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="theme-corner-login">
@@ -1164,13 +1109,13 @@ html[data-theme="dark"] .disp-btn.on,html[data-theme="dark"] .disp-btn[aria-pres
         <div class="step-dot" id="sd3"></div>
       </div>
       <div class="login-title" id="lbl-r1-title">🔑 Recuperar Palavra-passe</div>
-      <div class="step-label" id="lbl-r1-sub">Introduza o seu identificador e o email registado</div>
+      <div class="step-label" id="lbl-r1-sub">Introduza o ID do hotel e o email definido pela Agência na ficha</div>
       <div class="msg-box err" id="r1-err"></div>
       <div class="field"><label id="lbl-r1-id">Identificador do Hotel</label>
-        <input type="text" id="r1-id" placeholder="HOT001">
+        <input type="text" id="r1-id" placeholder="HOT001" autocomplete="username" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('r1-email').focus();}">
       </div>
       <div class="field"><label id="lbl-r1-email">Email registado na ficha (definido pela Agência)</label>
-        <input type="email" id="r1-email" placeholder="email@hotel.pt">
+        <input type="email" id="r1-email" placeholder="email@hotel.pt" autocomplete="email" onkeydown="if(event.key==='Enter'){event.preventDefault();doDemandarCodigo();}">
       </div>
       <button class="btn-primary" id="r1-btn" onclick="doDemandarCodigo()">
         <div class="sp"></div><span class="btn-t" id="lbl-r1-btn">Enviar Código</span>
@@ -1191,13 +1136,13 @@ html[data-theme="dark"] .disp-btn.on,html[data-theme="dark"] .disp-btn[aria-pres
       <div class="msg-box err" id="r2-err"></div>
       <div class="msg-box ok" id="r2-ok"></div>
       <div class="field"><label id="lbl-r2-code">Código de verificação (6 dígitos)</label>
-        <input type="text" id="r2-code" placeholder="123456" maxlength="6" style="letter-spacing:.25em;font-size:20px;font-weight:700;text-align:center">
+        <input type="text" id="r2-code" placeholder="123456" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" style="letter-spacing:.25em;font-size:20px;font-weight:700;text-align:center" oninput="this.value=this.value.replace(/\D/g,'').slice(0,6)">
       </div>
       <div class="field"><label id="lbl-r2-new">Nova palavra-passe (min. 8 car.)</label>
-        <input type="password" id="r2-new" placeholder="••••••••">
+        <input type="password" id="r2-new" placeholder="••••••••" autocomplete="new-password">
       </div>
       <div class="field"><label id="lbl-r2-cf">Confirmar nova palavra-passe</label>
-        <input type="password" id="r2-cf" placeholder="••••••••">
+        <input type="password" id="r2-cf" placeholder="••••••••" autocomplete="new-password" onkeydown="if(event.key==='Enter'){event.preventDefault();doConfirmarMDP();}">
       </div>
       <button class="btn-primary" id="r2-btn" onclick="doConfirmarMDP()">
         <div class="sp"></div><span class="btn-t" id="lbl-r2-btn">Alterar Palavra-passe</span>
@@ -1218,6 +1163,29 @@ html[data-theme="dark"] .disp-btn.on,html[data-theme="dark"] .disp-btn[aria-pres
       <div class="header-title">Portal <em>Hotel</em> · <span id="header-agency-name">Hotel</span></div>
     </div>
     <div class="header-right">
+      <div class="disp-menu-anchor">
+        <button type="button" class="disp-more-btn" onclick="toggleDispMenu(event)" title="Affichage" aria-label="Affichage" aria-expanded="false">⋮</button>
+        <div class="display-prefs disp-menu-pop" role="dialog" aria-label="Affichage" onclick="event.stopPropagation()">
+          <div class="disp-seg" role="group" aria-label="Thème">
+            <button type="button" class="disp-btn theme-btn" data-theme-pick="light" aria-pressed="true" title="Clair">☀️ Clair</button>
+            <button type="button" class="disp-btn theme-btn" data-theme-pick="dark" aria-pressed="false" title="Foncé">🌙 Foncé</button>
+          </div>
+          <div class="disp-lang-block">
+            <div class="disp-lang-lab">Idioma</div>
+            <div class="disp-seg disp-lang" role="group" aria-label="Idioma">
+              <button type="button" class="disp-btn" data-lang-pick="PT" onclick="setLang('PT','app')">PT</button>
+              <button type="button" class="disp-btn" data-lang-pick="EN" onclick="setLang('EN','app')">EN</button>
+              <button type="button" class="disp-btn" data-lang-pick="FR" onclick="setLang('FR','app')">FR</button>
+              <button type="button" class="disp-btn" data-lang-pick="ES" onclick="setLang('ES','app')">ES</button>
+            </div>
+          </div>
+          <div class="disp-seg" role="group" aria-label="Taille du texte">
+            <button type="button" class="disp-btn on" data-text-size-pick="sm" aria-pressed="true">Petite</button>
+            <button type="button" class="disp-btn" data-text-size-pick="md" aria-pressed="false">Moyenne</button>
+            <button type="button" class="disp-btn" data-text-size-pick="lg" aria-pressed="false">Grand</button>
+          </div>
+        </div>
+      </div>
       <div class="theme-row header-theme-inline">
         <div class="theme-seg" role="group" aria-label="Thème">
           <button type="button" class="theme-btn on" data-theme-pick="light" aria-pressed="true" title="Clair">☀️</button>
@@ -1230,25 +1198,14 @@ html[data-theme="dark"] .disp-btn.on,html[data-theme="dark"] .disp-btn[aria-pres
         <button type="button" class="lp" onclick="setLang('FR','app')">FR</button>
         <button type="button" class="lp" onclick="setLang('ES','app')">ES</button>
         <select id="lang-app-sel" class="lang-select-mobile" aria-label="Idioma" onchange="setLang(this.value,'app')">
-          <option value="PT">Português (PT)</option>
-          <option value="EN">English (EN)</option>
-          <option value="FR">Français (FR)</option>
-          <option value="ES">Español (ES)</option>
+          <option value="PT">PT</option>
+          <option value="EN">EN</option>
+          <option value="FR">FR</option>
+          <option value="ES">ES</option>
         </select>
       </div>
       <div class="ag-badge"><span class="dot-ok"></span><span id="ag-name-display">Hotel</span></div>
       <button class="btn-hdr" onclick="doLogout()" id="lbl-logout">⎋ Sair</button>
-    </div>
-  </div>
-  <div class="display-prefs" role="region" aria-label="Affichage">
-    <div class="disp-seg" role="group" aria-label="Thème">
-      <button type="button" class="disp-btn theme-btn" data-theme-pick="light" aria-pressed="true" title="Clair">☀️ Clair</button>
-      <button type="button" class="disp-btn theme-btn" data-theme-pick="dark" aria-pressed="false" title="Foncé">🌙 Foncé</button>
-    </div>
-    <div class="disp-seg" role="group" aria-label="Taille du texte">
-      <button type="button" class="disp-btn on" data-text-size-pick="sm" aria-pressed="true">Petite</button>
-      <button type="button" class="disp-btn" data-text-size-pick="md" aria-pressed="false">Moyenne</button>
-      <button type="button" class="disp-btn" data-text-size-pick="lg" aria-pressed="false">Grand</button>
     </div>
   </div>
 
@@ -1669,19 +1626,19 @@ const UI = {
   PT:{loginTitle:'🔐 Portal Hotel',agId:'Identificador do Hotel',agPass:'Palavra-passe',loginBtn:'Entrar',resetLink:'Alterar / Recuperar via email da ficha',r1Title:'🔑 Recuperar Palavra-passe',r1Sub:'Introduza o ID do hotel e o email definido pela Agência na ficha',r1Id:'Identificador do Hotel',r1Email:'Email da ficha (definido pela Agência)',r1Btn:'Enviar Código',back1:'Voltar ao login',r2Title:'📧 Verificar Código',r2Sub:'Código enviado para o seu email',r2Code:'Código de verificação (6 dígitos)',r2New:'Nova palavra-passe (min. 8 car.)',r2Cf:'Confirmar nova palavra-passe',r2Btn:'Alterar Palavra-passe',r2Hint:'O código é válido durante 15 minutos',back2:'Pedir novo código',errEmpty:'Preencha todos os campos.',errConn:'Erro de ligação.',errPwMatch:'As palavras-passe não coincidem.',errPwShort:'Mínimo 8 caracteres.',okPwChanged:'✅ Palavra-passe alterada com sucesso!',sTotal:'Total',sPend:'Pendentes',sConf:'Confirmadas',sUpcoming:'A Realizar',cardTtl:'Reservas Atribuídas',expExcel:'Excel',expPdf:'PDF',expOnlyOwn:'Sem reservas criadas por este hotel para exportar.',expNoMatch:'Nenhuma reserva da vista atual criada por este hotel.',refreshTxt:'Atualizar',fSearch:'Pesquisa',fSearchPh:'ID, cliente, email, telefone…',fDestPh:'Aeroporto, hotel, Oriente…',filtActive:'Filtros ativos',filtResults:'resultado(s)',fStatut:'Estatuto',fAll:'Todos',fPend:'⏳ Pendente',fConf:'✅ Confirmado',fCanc:'❌ Cancelado',fReal:'🏁 Realizado',fDs:'Data início',fDe:'Data fim',fDest:'Destino',fDestAll:'Todos',btnFilter:'Filtrar',btnReset:'Limpar',loading:'A carregar…',logout:'⎋ Sair',modalTtl:'Detalhes da Reserva',modalActions:'⚡ Ações',mPrix:'Preço (€)',mComment:'Comentário (opcional)',btnClose:'Fechar',btnCancel:'Cancelar',btnConfirm:'Confirmar',btnPrice:'Alterar Preço',btnPago:'Transfer pago',lblPayment:'Pagamento',toastPago:'💶 Transfer marcado como pago',msgPago:'💶 Transfer pago!',waTtl:'Confirmação WhatsApp → Cliente',waPhone:'WhatsApp cliente',waBtn:'Abrir WhatsApp → Cliente',hotelWaTtl:'Pedir disponibilidade à Agência — WhatsApp',hotelWaDesc:'Após guardar, envie esta mensagem à Agência Ruelas para pedir disponibilidade. A agência confirma, cancela ou ajusta o preço no sistema.',hotelWaBtn:'Pedir disponibilidade via WhatsApp',copyMsg:'Copiar Mensagem',calTtl:'Adicionar ao Calendário',colRef:'Ref.',colClient:'Cliente',colDate:'Data',colHour:'Hora',colRoute:'Trajet',colPax:'Pax',colPrice:'Preço',colStatus:'Estado',colActs:'Ações',emptyTitle:'Nenhuma reserva encontrada',emptySub:'Tente ajustar os filtros.',toastConf:'✅ Confirmada com sucesso',toastCanc:'❌ Cancelada',toastExcel:'📊 Excel exportado',toastPdf:'🖨️ PDF impresso',toastWa:'💬 WhatsApp aberto!',toastHotelWa:'💬 Pedido de disponibilidade enviado à agência!',toastPrice:'💶 Preço atualizado',toastCopy:'📋 Mensagem copiada!',confirmCancel:'Cancelar a reserva',msgConf:'✅ Reserva confirmada!',msgCanc:'❌ Reserva cancelada.',msgPrice:'💶 Preço atualizado!',pageOf:'de',lblClient:'Cliente',lblEmail:'Email',lblPhone:'Telefone',lblOta:'Ref. OTA',lblDate:'Data / Hora',lblPaxMalas:'Pax / Malas',lblOrigin:'Partida',lblAddrDep:'Morada Partida',lblDest:'Destino',lblAddrDest:'Morada Destino',lblFlight:'Nº Voo',lblTransport:'Nº Transporte',lblRoom:'Quarto',lblPrice:'Preço',lblStatus:'Estado',lblComments:'Comentários',tabAll:'Todas as Reservas',tabUpcoming:'Próximas Transferências',tabNova:'Nova Reserva',tabHistorico:'Histórico',upcomingTitle:'Próximas Transferências',upcomingSub:'Transfers futuros não realizados — por ordem cronológica',upcomingEmpty:'Nenhum transfer futuro pendente.',today:'Hoje',tomorrow:'Amanhã',emailPrevSec:'📧 Pré-visualização do texto enviado',waPrevLang:'Idioma da mensagem (lista)',payIncl:'Incluir modo de pagamento no texto',payModeLbl:'Modo de pagamento',payOff:'(não mostrar linha)',paySheet:'Definição da agência (gestão de acessos)',payDriver:'Numerário ao motorista',payRecep:'Numerário na receção do hotel',payCustomOpt:'Personalizado (texto livre)',payCustomLbl:'Texto personalizado (igual em todas as línguas)',payCustomPh:'Ex.: Pagamento no local…',
   hotelEditSec:'Editar reserva',heNom:'Nome do cliente',heTel:'Telefone',heVol:'Nº Voo',heDepart:'Partida',heDest:'Destino',heDate:'Data',heHeure:'Hora',heRoom:'Quarto',heCom:'Comentário',btnHotelSave:'Guardar alterações',hotelSaveOk:'✅ Alterações guardadas',hotelSaveErr:'Erro ao guardar',hotelEditLocked:'Após confirmação pela agência, só pode alterar o nome do cliente e o nº de voo.',
   novaTtl:'Nova Reserva',novaLockedTtl:'Criação de reservas desativada',novaLockedSub:'Contacte a Agência Ruelas para ativar esta funcionalidade para o seu hotel.',nvNom:'Nome do Cliente *',nvEmail:'Email *',nvTel:'Telefone *',nvOta:'Ref. OTA / Reserva',nvOrigem:'Origem do Transfer',nvData:'Data do Transfer *',nvHora:'Hora do Transfer *',nvAdultos:'Adultos *',nvBebes:'Bebés',nvCadeiraRodas:'Cadeira de rodas',nvCadeiraBebe:'Cadeira auto bebé',nvMalasGrandes:'Malas grandes',nvMochilas:'Mochilas',nvSecClient:'👤 Cliente',nvSecPax:'👥 Passageiros & bagagens',nvSecTransfer:'🚗 Transfer',nvSecExtra:'📝 Complementos',nvAgencyHint:'A Agência Ruelas confirma as reservas criadas pelo hotel. Após guardar, a reserva fica Pendente até confirmação da agência. Pode enviar WhatsApp para disponibilizar.',nvFlowHint:'Preencha pela ordem: Cliente → Passageiros → Transfer → Complementos. Data/hora não podem ser no passado.',nvMapToggle:'🗺️ Ver trajeto no mapa',nvMapHint:'opcional · tempo estimado aproximado segundo a distância',nvErrDatePast:'⚠️ Não é possível criar uma reserva com data/hora no passado.',nvLockPast:'Dia do transfer igual ou ultrapassado: edição e anulação bloqueadas (regra staff).',nvPaxSummary:'Total pax: {p} · Total bagagens: {b}',nvErrAdultos:'⚠️ Indique pelo menos 1 adulto',nvErrLieu:'⚠️ Selecione partida e destino',nvErrAddrDep:'⚠️ Morada de partida obrigatória quando o lugar não está na lista',nvErrAddrDest:'⚠️ Morada de destino obrigatória quando o lugar não está na lista',nvPartida:'Ponto de Partida *',nvEndPartida:'Morada de Partida',nvDestino:'Destino *',nvEndDestino:'Morada de Destino',nvVoo:'Nº Voo',nvQuarto:'Nº Quarto',nvCom:'Comentário (opcional)',nvOAirport:'✈ Aeroporto',nvOHotel:'🏨 Hotel',nvOBus:'🚌 Autocarro',nvOTrain:'🚂 Comboio',nvOHighspeed:'🚄 Alta Velocidade',nvClear:'Limpar',nvSubmit:'Guardar',nvSubmitting:'A guardar…',nvOk:'✅ Reserva guardada — peça disponibilidade à agência por WhatsApp',nvAskWa:'Abrir WhatsApp para pedir disponibilidade?',nvErrRequired:'⚠️ Preencha os campos obrigatórios (*)',nvErrEmail:'⚠️ Email inválido',
-  histTtl:'Histórico de Reservas',histRefresh:'Atualizar',histNote:'Últimas atualizações das suas reservas. Clique em «Ver histórico» para consultar todas as ações de uma reserva.',histLoading:'A carregar…',histEmpty:'Nenhuma reserva encontrada.',histLastUpd:'Última Atualização',histAction:'Ver Histórico',histModalTtl:'Histórico da Reserva',histModalLoading:'A carregar…',histModalClose:'Fechar',histModalEmpty:'Sem registos de histórico para esta reserva.',histModalErr:'Erro ao carregar histórico.',btnHist:'Histórico'},
+  histTtl:'Histórico de Reservas',histRefresh:'Atualizar',histNote:'Últimas atualizações das suas reservas. Clique em «Ver histórico» para consultar todas as ações de uma reserva.',histLoading:'A carregar…',histEmpty:'Nenhuma reserva encontrada.',histLastUpd:'Última Atualização',histAction:'Ver Histórico',histModalTtl:'Histórico da Reserva',histModalLoading:'A carregar…',histModalClose:'Fechar',histModalEmpty:'Sem registos de histórico para esta reserva.',histModalErr:'Erro ao carregar histórico.',btnHist:'Histórico',dispMenu:'Exibição',themeLight:'Claro',themeDark:'Escuro',sizeSm:'Pequena',sizeMd:'Média',sizeLg:'Grande',themeGroup:'Tema',sizeGroup:'Tamanho do texto',bnRes:'Reservas',bnUpcomingShort:'Próximas',bnNew:'Nova',bnHotels:'Hotéis',bnMore:'Mais',bnAll:'Reservas',bnUpcoming:'Próximas',bnNova:'Nova',bnHist:'Histórico',langLabel:'Idioma'},
   EN:{loginTitle:'🔐 Hotel Portal',agId:'Hotel ID',agPass:'Password',loginBtn:'Sign In',resetLink:'Change / Reset via registered email',r1Title:'🔑 Reset Password',r1Sub:'Enter hotel ID and the email set by the Agency on the hotel record',r1Id:'Hotel ID',r1Email:'Email on file (set by Agency)',r1Btn:'Send Code',back1:'Back to login',r2Title:'📧 Verify Code',r2Sub:'Code sent to your email',r2Code:'Verification code (6 digits)',r2New:'New password (min. 8 chars)',r2Cf:'Confirm new password',r2Btn:'Change Password',r2Hint:'The code is valid for 15 minutes',back2:'Request new code',errEmpty:'Please fill in all fields.',errConn:'Connection error.',errPwMatch:'Passwords do not match.',errPwShort:'Minimum 8 characters.',okPwChanged:'✅ Password changed successfully!',sTotal:'Total',sPend:'Pending',sConf:'Confirmed',sUpcoming:'Upcoming',cardTtl:'Assigned Bookings',expExcel:'Excel',expPdf:'PDF',expOnlyOwn:'No bookings created by this hotel to export.',expNoMatch:'No bookings in the current view created by this hotel.',refreshTxt:'Refresh',fSearch:'Search',fSearchPh:'ID, client, email, phone…',fDestPh:'Airport, hotel, Oriente…',filtActive:'Active filters',filtResults:'result(s)',fStatut:'Status',fAll:'All',fPend:'⏳ Pending',fConf:'✅ Confirmed',fCanc:'❌ Cancelled',fReal:'🏁 Completed',fDs:'Start date',fDe:'End date',fDest:'Destination',fDestAll:'All',btnFilter:'Filter',btnReset:'Clear',loading:'Loading…',logout:'⎋ Sign out',modalTtl:'Booking Details',modalActions:'⚡ Actions',mPrix:'Price (€)',mComment:'Comment (optional)',btnClose:'Close',btnCancel:'Cancel',btnConfirm:'Confirm',btnPrice:'Change Price',btnPago:'Transfer paid',lblPayment:'Payment',toastPago:'💶 Transfer marked as paid',msgPago:'💶 Transfer paid!',waTtl:'WhatsApp Confirmation → Client',waPhone:'Client WhatsApp',waBtn:'Open WhatsApp → Client',hotelWaTtl:'Request availability from Agency — WhatsApp',hotelWaDesc:'After saving, send this message to Agence Ruelas to request availability. The agency confirms, cancels or adjusts the price in the system.',hotelWaBtn:'Request availability via WhatsApp',copyMsg:'Copy Message',calTtl:'Add to Calendar',colRef:'Ref.',colClient:'Client',colDate:'Date',colHour:'Time',colRoute:'Route',colPax:'Pax',colPrice:'Price',colStatus:'Status',colActs:'Actions',emptyTitle:'No bookings found',emptySub:'Try adjusting the filters.',toastConf:'✅ Confirmed successfully',toastCanc:'❌ Cancelled',toastExcel:'📊 Excel exported',toastPdf:'🖨️ PDF printed',toastWa:'💬 WhatsApp opened!',toastHotelWa:'💬 Availability request sent to the agency!',toastPrice:'💶 Price updated',toastCopy:'📋 Message copied!',confirmCancel:'Cancel this booking',msgConf:'✅ Booking confirmed!',msgCanc:'❌ Booking cancelled.',msgPrice:'💶 Price updated!',pageOf:'of',lblClient:'Client',lblEmail:'Email',lblPhone:'Phone',lblOta:'OTA Ref.',lblDate:'Date / Time',lblPaxMalas:'Pax / Bags',lblOrigin:'Origin',lblAddrDep:'Departure Address',lblDest:'Destination',lblAddrDest:'Destination Address',lblFlight:'Flight N°',lblTransport:'Transport N°',lblRoom:'Room',lblPrice:'Price',lblStatus:'Status',lblComments:'Comments',tabAll:'All Bookings',tabUpcoming:'Upcoming Transfers',tabNova:'New Booking',tabHistorico:'History',upcomingTitle:'Upcoming Transfers',upcomingSub:'Future transfers not yet completed — in chronological order',upcomingEmpty:'No upcoming pending transfers.',today:'Today',tomorrow:'Tomorrow',emailPrevSec:'📧 Message preview',waPrevLang:'Message language (dropdown)',payIncl:'Include payment method in the text',payModeLbl:'Payment mode',payOff:'(hide line)',paySheet:'Agency setting (access management)',payDriver:'Cash to the driver',payRecep:'Cash at hotel reception',payCustomOpt:'Custom (free text)',payCustomLbl:'Custom text (all languages)',payCustomPh:'e.g. Payment on arrival…',
   hotelEditSec:'Edit booking',heNom:'Client name',heTel:'Phone',heVol:'Flight N°',heDepart:'Pickup',heDest:'Destination',heDate:'Date',heHeure:'Time',heRoom:'Room',heCom:'Comment',btnHotelSave:'Save changes',hotelSaveOk:'✅ Changes saved',hotelSaveErr:'Error saving',hotelEditLocked:'After agency confirmation, you can only change the client name and flight number.',
   novaTtl:'New Booking',novaLockedTtl:'Booking creation disabled',novaLockedSub:'Contact Agence Ruelas to enable this feature for your hotel.',nvNom:'Client Name *',nvEmail:'Email *',nvTel:'Phone *',nvOta:'OTA / Booking Ref.',nvOrigem:'Transfer Origin',nvData:'Transfer Date *',nvHora:'Transfer Time *',nvAdultos:'Adults *',nvBebes:'Babies',nvCadeiraRodas:'Wheelchair',nvCadeiraBebe:'Baby car seat',nvMalasGrandes:'Large bags',nvMochilas:'Backpacks',nvSecClient:'👤 Client',nvSecPax:'👥 Passengers & luggage',nvSecTransfer:'🚗 Transfer',nvSecExtra:'📝 Extras',nvAgencyHint:'Agence Ruelas confirms bookings created by the hotel. After saving, the booking stays Pending until the agency confirms. You can send WhatsApp to notify availability.',nvFlowHint:'Fill in order: Client → Passengers → Transfer → Extras. Date/time cannot be in the past.',nvMapToggle:'🗺️ Show route on map',nvMapHint:'optional · approximate ETA based on distance',nvErrDatePast:'⚠️ Cannot create a booking with a past date/time.',nvLockPast:'Transfer day reached or passed: edit and cancel are locked (staff rule).',nvPaxSummary:'Total pax: {p} · Total bags: {b}',nvErrAdultos:'⚠️ Enter at least 1 adult',nvErrLieu:'⚠️ Select pickup and destination',nvErrAddrDep:'⚠️ Pickup address required when the place is not in the list',nvErrAddrDest:'⚠️ Destination address required when the place is not in the list',nvPartida:'Pickup Point *',nvEndPartida:'Pickup Address',nvDestino:'Destination *',nvEndDestino:'Destination Address',nvVoo:'Flight N°',nvQuarto:'Room N°',nvCom:'Comment (optional)',nvOAirport:'✈ Airport',nvOHotel:'🏨 Hotel',nvOBus:'🚌 Bus',nvOTrain:'🚂 Train',nvOHighspeed:'🚄 High-Speed',nvClear:'Clear',nvSubmit:'Save',nvSubmitting:'Saving…',nvOk:'✅ Booking saved — request availability from the agency via WhatsApp',nvAskWa:'Open WhatsApp to request availability?',nvErrRequired:'⚠️ Please fill in the required fields (*)',nvErrEmail:'⚠️ Invalid email',
-  histTtl:'Booking History',histRefresh:'Refresh',histNote:'Latest updates on your bookings. Click "View history" to see all actions for a booking.',histLoading:'Loading…',histEmpty:'No bookings found.',histLastUpd:'Last Update',histAction:'View History',histModalTtl:'Booking History',histModalLoading:'Loading…',histModalClose:'Close',histModalEmpty:'No history records for this booking.',histModalErr:'Error loading history.',btnHist:'History'},
+  histTtl:'Booking History',histRefresh:'Refresh',histNote:'Latest updates on your bookings. Click "View history" to see all actions for a booking.',histLoading:'Loading…',histEmpty:'No bookings found.',histLastUpd:'Last Update',histAction:'View History',histModalTtl:'Booking History',histModalLoading:'Loading…',histModalClose:'Close',histModalEmpty:'No history records for this booking.',histModalErr:'Error loading history.',btnHist:'History',dispMenu:'Display',themeLight:'Light',themeDark:'Dark',sizeSm:'Small',sizeMd:'Medium',sizeLg:'Large',themeGroup:'Theme',sizeGroup:'Text size',bnRes:'Bookings',bnUpcomingShort:'Upcoming',bnNew:'New',bnHotels:'Hotels',bnMore:'More',bnAll:'Bookings',bnUpcoming:'Upcoming',bnNova:'New',bnHist:'History',langLabel:'Language'},
   FR:{loginTitle:'🔐 Portail Hôtel',agId:'Identifiant hôtel',agPass:'Mot de passe',loginBtn:'Se connecter',resetLink:'Changer / Récupérer via email de la fiche',r1Title:'🔑 Récupérer le Mot de Passe',r1Sub:"Saisissez l'ID hôtel et l'email défini par l'Agence sur la fiche",r1Id:'Identifiant hôtel',r1Email:'Email de la fiche (défini par l\'Agence)',r1Btn:'Envoyer le Code',back1:'Retour au login',r2Title:'📧 Vérifier le Code',r2Sub:'Code envoyé à votre email',r2Code:'Code de vérification (6 chiffres)',r2New:'Nouveau mot de passe (min. 8 car.)',r2Cf:'Confirmer le nouveau mot de passe',r2Btn:'Changer le Mot de Passe',r2Hint:'Le code est valide pendant 15 minutes',back2:'Demander un nouveau code',errEmpty:'Veuillez remplir tous les champs.',errConn:'Erreur de connexion.',errPwMatch:'Les mots de passe ne correspondent pas.',errPwShort:'Minimum 8 caractères.',okPwChanged:'✅ Mot de passe changé avec succès !',sTotal:'Total',sPend:'En attente',sConf:'Confirmées',sUpcoming:'À réaliser',cardTtl:'Réservations Attribuées',expExcel:'Excel',expPdf:'PDF',expOnlyOwn:'Aucune réservation créée par cet hôtel à exporter.',expNoMatch:'Aucune réservation de la vue actuelle créée par cet hôtel.',refreshTxt:'Actualiser',fSearch:'Recherche',fSearchPh:'ID, client, e-mail, téléphone…',fDestPh:'Aéroport, hôtel, Oriente…',filtActive:'Filtres actifs',filtResults:'résultat(s)',fStatut:'Statut',fAll:'Tous',fPend:'⏳ En attente',fConf:'✅ Confirmée',fCanc:'❌ Annulée',fReal:'🏁 Réalisée',fDs:'Date début',fDe:'Date fin',fDest:'Destination',fDestAll:'Tous',btnFilter:'Filtrer',btnReset:'Effacer',loading:'Chargement…',logout:'⎋ Déconnexion',modalTtl:'Détails de la Réservation',modalActions:'⚡ Actions',mPrix:'Prix (€)',mComment:'Commentaire (optionnel)',btnClose:'Fermer',btnCancel:'Annuler',btnConfirm:'Confirmer',btnPrice:'Modifier le Prix',btnPago:'Transfer payé',lblPayment:'Paiement',toastPago:'💶 Transfer marqué comme payé',msgPago:'💶 Transfer payé !',waTtl:'Confirmation WhatsApp → Client',waPhone:'WhatsApp client',waBtn:'Ouvrir WhatsApp → Client',hotelWaTtl:"Demande de disponibilité à l'Agence — WhatsApp",hotelWaDesc:"Après enregistrement, envoyez ce message à l'Agence Ruelas pour demander la disponibilité. L'agence confirme, annule ou ajuste le prix dans le système.",hotelWaBtn:'Demander disponibilité via WhatsApp',copyMsg:'Copier le Message',calTtl:'Ajouter au Calendrier',colRef:'Réf.',colClient:'Client',colDate:'Date',colHour:'Heure',colRoute:'Trajet',colPax:'Pax',colPrice:'Prix',colStatus:'Statut',colActs:'Actions',emptyTitle:'Aucune réservation trouvée',emptySub:"Essayez d'ajuster les filtres.",toastConf:'✅ Confirmée avec succès',toastCanc:'❌ Annulée',toastExcel:'📊 Excel exporté',toastPdf:'🖨️ PDF imprimé',toastWa:'💬 WhatsApp ouvert !',toastHotelWa:"💬 Demande de disponibilité envoyée à l'agence !",toastPrice:'💶 Prix mis à jour',toastCopy:'📋 Message copié !',confirmCancel:'Annuler cette réservation',msgConf:'✅ Réservation confirmée !',msgCanc:'❌ Réservation annulée.',msgPrice:'💶 Prix mis à jour !',pageOf:'sur',lblClient:'Client',lblEmail:'Email',lblPhone:'Téléphone',lblOta:'Réf. OTA',lblDate:'Date / Heure',lblPaxMalas:'Pax / Bagages',lblOrigin:'Départ',lblAddrDep:'Adresse départ',lblDest:'Destination',lblAddrDest:'Adresse destination',lblFlight:'N° Vol',lblTransport:'N° Transport',lblRoom:'Chambre',lblPrice:'Prix',lblStatus:'Statut',lblComments:'Commentaires',tabAll:'Toutes les Réservations',tabUpcoming:'Prochains Transferts',tabNova:'Nouvelle Réservation',tabHistorico:'Historique',upcomingTitle:'Prochains Transferts',upcomingSub:'Transferts futurs non encore réalisés — par ordre chronologique',upcomingEmpty:'Aucun transfert futur en attente.',today:"Aujourd'hui",tomorrow:'Demain',emailPrevSec:'📧 Aperçu du texte envoyé',waPrevLang:'Langue du message (liste)',payIncl:'Inclure le mode de paiement dans le texte',payModeLbl:'Mode de paiement',payOff:'(ne pas afficher)',paySheet:'Paramètre agence (gestion des accès)',payDriver:'Espèces au chauffeur',payRecep:'Espèces à la réception',payCustomOpt:'Personnalisé (texte libre)',payCustomLbl:'Texte personnalisé (toutes langues)',payCustomPh:'Ex. : Paiement sur place…',
   hotelEditSec:'Modifier la réservation',heNom:'Nom du client',heTel:'Téléphone',heVol:'N° Vol',heDepart:'Départ',heDest:'Destination',heDate:'Date',heHeure:'Heure',heRoom:'Chambre',heCom:'Commentaire',btnHotelSave:'Enregistrer les modifications',hotelSaveOk:'✅ Modifications enregistrées',hotelSaveErr:"Erreur d'enregistrement",hotelEditLocked:"Après confirmation par l'agence, vous ne pouvez modifier que le nom du client et le n° de vol.",
   novaTtl:'Nouvelle Réservation',novaLockedTtl:'Création de réservations désactivée',novaLockedSub:"Contactez l'Agence Ruelas pour activer cette fonctionnalité pour votre hôtel.",nvNom:'Nom du Client *',nvEmail:'Email *',nvTel:'Téléphone *',nvOta:'Réf. OTA / Réservation',nvOrigem:'Origine du Transfert',nvData:'Date du Transfert *',nvHora:'Heure du Transfert *',nvAdultos:'Adultes *',nvBebes:'Bébés',nvCadeiraRodas:'Fauteuil roulant',nvCadeiraBebe:'Siège auto bébé',nvMalasGrandes:'Grandes valises',nvMochilas:'Sacs à dos',nvSecClient:'👤 Client',nvSecPax:'👥 Passagers & bagages',nvSecTransfer:'🚗 Transfer',nvSecExtra:'📝 Compléments',nvAgencyHint:'L\'Agence Ruelas confirme les réservations créées par l\'hôtel. Après enregistrement, la réservation reste En attente jusqu\'à confirmation de l\'agence. Vous pouvez envoyer WhatsApp pour signaler la disponibilité.',nvFlowHint:'Remplissez dans l\'ordre : Client → Passagers → Transfer → Compléments. Date/heure ne peuvent pas être dans le passé.',nvMapToggle:'🗺️ Voir le trajet sur la carte',nvMapHint:'optionnel · temps estimé approximatif selon la distance',nvErrDatePast:'⚠️ Impossible de créer une réservation à une date/heure passée.',nvLockPast:'Jour du transfert atteint ou passé : modification et annulation bloquées (règle staff).',nvPaxSummary:'Total pax: {p} · Total bagages: {b}',nvErrAdultos:'⚠️ Indiquez au moins 1 adulte',nvErrLieu:'⚠️ Sélectionnez départ et destination',nvErrAddrDep:'⚠️ Adresse de départ obligatoire si le lieu n\'est pas dans la liste',nvErrAddrDest:'⚠️ Adresse de destination obligatoire si le lieu n\'est pas dans la liste',nvPartida:'Point de Départ *',nvEndPartida:'Adresse de Départ',nvDestino:'Destination *',nvEndDestino:'Adresse de Destination',nvVoo:'N° Vol',nvQuarto:'N° Chambre',nvCom:'Commentaire (optionnel)',nvOAirport:'✈ Aéroport',nvOHotel:'🏨 Hôtel',nvOBus:'🚌 Autocar',nvOTrain:'🚂 Train',nvOHighspeed:'🚄 Grande Vitesse',nvClear:'Effacer',nvSubmit:'Enregistrer',nvSubmitting:'Enregistrement…',nvOk:"✅ Réservation enregistrée — demandez la disponibilité à l'agence par WhatsApp",nvAskWa:'Ouvrir WhatsApp pour demander la disponibilité ?',nvErrRequired:'⚠️ Veuillez remplir les champs obligatoires (*)',nvErrEmail:'⚠️ Email invalide',
-  histTtl:'Historique des Réservations',histRefresh:'Actualiser',histNote:'Dernières mises à jour de vos réservations. Cliquez sur « Voir historique » pour consulter toutes les actions d\'une réservation.',histLoading:'Chargement…',histEmpty:'Aucune réservation trouvée.',histLastUpd:'Dernière Mise à Jour',histAction:'Voir Historique',histModalTtl:'Historique de la Réservation',histModalLoading:'Chargement…',histModalClose:'Fermer',histModalEmpty:'Aucun historique pour cette réservation.',histModalErr:'Erreur de chargement de l\'historique.',btnHist:'Historique'},
+  histTtl:'Historique des Réservations',histRefresh:'Actualiser',histNote:'Dernières mises à jour de vos réservations. Cliquez sur « Voir historique » pour consulter toutes les actions d\'une réservation.',histLoading:'Chargement…',histEmpty:'Aucune réservation trouvée.',histLastUpd:'Dernière Mise à Jour',histAction:'Voir Historique',histModalTtl:'Historique de la Réservation',histModalLoading:'Chargement…',histModalClose:'Fermer',histModalEmpty:'Aucun historique pour cette réservation.',histModalErr:'Erreur de chargement de l\'historique.',btnHist:'Historique',dispMenu:'Affichage',themeLight:'Clair',themeDark:'Foncé',sizeSm:'Petite',sizeMd:'Moyenne',sizeLg:'Grande',themeGroup:'Thème',sizeGroup:'Taille du texte',bnRes:'Réserv.',bnUpcomingShort:'Prochains',bnNew:'Nouvelle',bnHotels:'Hôtels',bnMore:'Plus',bnAll:'Réserv.',bnUpcoming:'Prochains',bnNova:'Nouvelle',bnHist:'Historique',langLabel:'Langue'},
   ES:{loginTitle:'🔐 Portal Hotel',agId:'Identificador del Hotel',agPass:'Contraseña',loginBtn:'Entrar',resetLink:'Cambiar / Recuperar vía email de la ficha',r1Title:'🔑 Recuperar Contraseña',r1Sub:'Introduzca el ID del hotel y el email definido por la Agencia',r1Id:'Identificador del Hotel',r1Email:'Email de la ficha (definido por la Agencia)',r1Btn:'Enviar Código',back1:'Volver al acceso',r2Title:'📧 Verificar Código',r2Sub:'Código enviado a su email',r2Code:'Código de verificación (6 dígitos)',r2New:'Nueva contraseña (mín. 8 car.)',r2Cf:'Confirmar nueva contraseña',r2Btn:'Cambiar Contraseña',r2Hint:'El código es válido durante 15 minutos',back2:'Pedir nuevo código',errEmpty:'Por favor rellene todos los campos.',errConn:'Error de conexión.',errPwMatch:'Las contraseñas no coinciden.',errPwShort:'Mínimo 8 caracteres.',okPwChanged:'✅ ¡Contraseña cambiada con éxito!',sTotal:'Total',sPend:'Pendientes',sConf:'Confirmadas',sUpcoming:'A Realizar',cardTtl:'Reservas Asignadas',expExcel:'Excel',expPdf:'PDF',expOnlyOwn:'Sin reservas creadas por este hotel para exportar.',expNoMatch:'Ninguna reserva de la vista actual creada por este hotel.',refreshTxt:'Actualizar',fSearch:'Búsqueda',fSearchPh:'ID, cliente, email, teléfono…',fDestPh:'Aeropuerto, hotel, Oriente…',filtActive:'Filtros activos',filtResults:'resultado(s)',fStatut:'Estado',fAll:'Todos',fPend:'⏳ Pendiente',fConf:'✅ Confirmada',fCanc:'❌ Cancelada',fReal:'🏁 Realizada',fDs:'Fecha inicio',fDe:'Fecha fin',fDest:'Destino',fDestAll:'Todos',btnFilter:'Filtrar',btnReset:'Borrar',loading:'Cargando…',logout:'⎋ Salir',modalTtl:'Detalles de la Reserva',modalActions:'⚡ Acciones',mPrix:'Precio (€)',mComment:'Comentario (opcional)',btnClose:'Cerrar',btnCancel:'Cancelar',btnConfirm:'Confirmar',btnPrice:'Cambiar Precio',btnPago:'Transfer pagado',lblPayment:'Pago',toastPago:'💶 Transfer marcado como pagado',msgPago:'💶 ¡Transfer pagado!',waTtl:'Confirmación WhatsApp → Cliente',waPhone:'WhatsApp cliente',waBtn:'Abrir WhatsApp → Cliente',hotelWaTtl:'Solicitar disponibilidad a la Agencia — WhatsApp',hotelWaDesc:'Tras guardar, envíe este mensaje a Agence Ruelas para solicitar disponibilidad. La agencia confirma, cancela o ajusta el precio en el sistema.',hotelWaBtn:'Solicitar disponibilidad via WhatsApp',copyMsg:'Copiar Mensaje',calTtl:'Agregar al Calendario',colRef:'Ref.',colClient:'Cliente',colDate:'Fecha',colHour:'Hora',colRoute:'Ruta',colPax:'Pax',colPrice:'Precio',colStatus:'Estado',colActs:'Acciones',emptyTitle:'No se encontraron reservas',emptySub:'Intente ajustar los filtros.',toastConf:'✅ Confirmada con éxito',toastCanc:'❌ Cancelada',toastExcel:'📊 Excel exportado',toastPdf:'🖨️ PDF impreso',toastWa:'💬 ¡WhatsApp abierto!',toastHotelWa:'💬 ¡Solicitud de disponibilidad enviada a la agencia!',toastPrice:'💶 Precio actualizado',toastCopy:'📋 ¡Mensaje copiado!',confirmCancel:'Cancelar esta reserva',msgConf:'✅ ¡Reserva confirmada!',msgCanc:'❌ Reserva cancelada.',msgPrice:'💶 ¡Precio actualizado!',pageOf:'de',lblClient:'Cliente',lblEmail:'Email',lblPhone:'Teléfono',lblOta:'Ref. OTA',lblDate:'Fecha / Hora',lblPaxMalas:'Pax / Maletas',lblOrigin:'Salida',lblAddrDep:'Dirección salida',lblDest:'Destino',lblAddrDest:'Dirección destino',lblFlight:'N° Vuelo',lblTransport:'N° Transporte',lblRoom:'Habitación',lblPrice:'Precio',lblStatus:'Estado',lblComments:'Comentarios',tabAll:'Todas las Reservas',tabUpcoming:'Próximas Transferencias',tabNova:'Nueva Reserva',tabHistorico:'Historial',upcomingTitle:'Próximas Transferencias',upcomingSub:'Transferencias futuras no realizadas — en orden cronológico',upcomingEmpty:'No hay transferencias futuras pendientes.',today:'Hoy',tomorrow:'Mañana',emailPrevSec:'📧 Vista previa del texto enviado',waPrevLang:'Idioma del mensaje (lista)',payIncl:'Incluir modo de pago en el texto',payModeLbl:'Modo de pago',payOff:'(no mostrar)',paySheet:'Definición de la agencia (gestión de accesos)',payDriver:'Efectivo al conductor',payRecep:'Efectivo en recepción del hotel',payCustomOpt:'Personalizado (texto libre)',payCustomLbl:'Texto personalizado (todas las lenguas)',payCustomPh:'Ej.: Pago en destino…',
   hotelEditSec:'Editar reserva',heNom:'Nombre del cliente',heTel:'Teléfono',heVol:'Nº Vuelo',heDepart:'Salida',heDest:'Destino',heDate:'Fecha',heHeure:'Hora',heRoom:'Habitación',heCom:'Comentario',btnHotelSave:'Guardar cambios',hotelSaveOk:'✅ Cambios guardados',hotelSaveErr:'Error al guardar',hotelEditLocked:'Tras la confirmación de la agencia, solo puede cambiar el nombre del cliente y el nº de vuelo.',
   novaTtl:'Nueva Reserva',novaLockedTtl:'Creación de reservas desactivada',novaLockedSub:'Contacte a la Agencia Ruelas para activar esta función para su hotel.',nvNom:'Nombre del Cliente *',nvEmail:'Email *',nvTel:'Teléfono *',nvOta:'Ref. OTA / Reserva',nvOrigem:'Origen del Traslado',nvData:'Fecha del Traslado *',nvHora:'Hora del Traslado *',nvAdultos:'Adultos *',nvBebes:'Bebés',nvCadeiraRodas:'Silla de ruedas',nvCadeiraBebe:'Silla auto bebé',nvMalasGrandes:'Maletas grandes',nvMochilas:'Mochilas',nvSecClient:'👤 Cliente',nvSecPax:'👥 Pasajeros & equipaje',nvSecTransfer:'🚗 Traslado',nvSecExtra:'📝 Complementos',nvAgencyHint:'La Agencia Ruelas confirma las reservas creadas por el hotel. Tras guardar, la reserva queda Pendiente hasta la confirmación de la agencia. Puede enviar WhatsApp para avisar disponibilidad.',nvFlowHint:'Complete en orden: Cliente → Pasajeros → Traslado → Complementos. Fecha/hora no pueden ser pasadas.',nvMapToggle:'🗺️ Ver trayecto en el mapa',nvMapHint:'opcional · tiempo estimado aproximado según la distancia',nvErrDatePast:'⚠️ No se puede crear una reserva con fecha/hora pasada.',nvLockPast:'Día del traslado alcanzado o pasado: edición y anulación bloqueadas (regla staff).',nvPaxSummary:'Total pax: {p} · Total equipaje: {b}',nvErrAdultos:'⚠️ Indique al menos 1 adulto',nvErrLieu:'⚠️ Seleccione salida y destino',nvErrAddrDep:'⚠️ Dirección de salida obligatoria cuando el lugar no está en la lista',nvErrAddrDest:'⚠️ Dirección de destino obligatoria cuando el lugar no está en la lista',nvPartida:'Punto de Salida *',nvEndPartida:'Dirección de Salida',nvDestino:'Destino *',nvEndDestino:'Dirección de Destino',nvVoo:'Nº Vuelo',nvQuarto:'Nº Habitación',nvCom:'Comentario (opcional)',nvOAirport:'✈ Aeropuerto',nvOHotel:'🏨 Hotel',nvOBus:'🚌 Autobús',nvOTrain:'🚂 Tren',nvOHighspeed:'🚄 Alta Velocidad',nvClear:'Borrar',nvSubmit:'Guardar',nvSubmitting:'Guardando…',nvOk:'✅ Reserva guardada — solicite disponibilidad a la agencia por WhatsApp',nvAskWa:'¿Abrir WhatsApp para solicitar disponibilidad?',nvErrRequired:'⚠️ Rellene los campos obligatorios (*)',nvErrEmail:'⚠️ Email inválido',
-  histTtl:'Historial de Reservas',histRefresh:'Actualizar',histNote:'Últimas actualizaciones de sus reservas. Haga clic en «Ver historial» para consultar todas las acciones de una reserva.',histLoading:'Cargando…',histEmpty:'No se encontraron reservas.',histLastUpd:'Última Actualización',histAction:'Ver Historial',histModalTtl:'Historial de la Reserva',histModalLoading:'Cargando…',histModalClose:'Cerrar',histModalEmpty:'Sin registros de historial para esta reserva.',histModalErr:'Error al cargar el historial.',btnHist:'Historial'}
+  histTtl:'Historial de Reservas',histRefresh:'Actualizar',histNote:'Últimas actualizaciones de sus reservas. Haga clic en «Ver historial» para consultar todas las acciones de una reserva.',histLoading:'Cargando…',histEmpty:'No se encontraron reservas.',histLastUpd:'Última Actualización',histAction:'Ver Historial',histModalTtl:'Historial de la Reserva',histModalLoading:'Cargando…',histModalClose:'Cerrar',histModalEmpty:'Sin registros de historial para esta reserva.',histModalErr:'Error al cargar el historial.',btnHist:'Historial',dispMenu:'Visualización',themeLight:'Claro',themeDark:'Oscuro',sizeSm:'Pequeña',sizeMd:'Mediana',sizeLg:'Grande',themeGroup:'Tema',sizeGroup:'Tamaño del texto',bnRes:'Reservas',bnUpcomingShort:'Próximas',bnNew:'Nueva',bnHotels:'Hoteles',bnMore:'Más',bnAll:'Reservas',bnUpcoming:'Próximas',bnNova:'Nueva',bnHist:'Historial',langLabel:'Idioma'}
 };
 
 (function(){
@@ -1960,13 +1917,54 @@ function closeOv(id, e){
 // ═══════════════════════════════════════════════════════════════════
 // LANGUE
 // ═══════════════════════════════════════════════════════════════════
+function applyDispI18n(o){
+  if(!o) return;
+  document.querySelectorAll('.disp-more-btn').forEach(function(b){
+    b.title = o.dispMenu || '';
+    b.setAttribute('aria-label', o.dispMenu || '');
+  });
+  document.querySelectorAll('.disp-menu-pop').forEach(function(p){
+    p.setAttribute('aria-label', o.dispMenu || '');
+  });
+  document.querySelectorAll('.disp-menu-pop .disp-seg').forEach(function(g){
+    if(g.classList.contains('disp-lang')) g.setAttribute('aria-label', o.langLabel||'');
+    else if(g.querySelector('[data-text-size-pick]')) g.setAttribute('aria-label', o.sizeGroup||'');
+    else g.setAttribute('aria-label', o.themeGroup||'');
+  });
+  document.querySelectorAll('.disp-lang-lab').forEach(function(el){ el.textContent = o.langLabel||''; });
+  document.querySelectorAll('.theme-seg[role="group"]').forEach(function(g){
+    g.setAttribute('aria-label', o.themeGroup||'');
+  });
+  document.querySelectorAll('.disp-btn[data-theme-pick="light"]').forEach(function(b){
+    b.textContent = '☀️ ' + (o.themeLight||'');
+    b.title = o.themeLight||'';
+  });
+  document.querySelectorAll('.disp-btn[data-theme-pick="dark"]').forEach(function(b){
+    b.textContent = '🌙 ' + (o.themeDark||'');
+    b.title = o.themeDark||'';
+  });
+  document.querySelectorAll('.theme-seg [data-theme-pick="light"]').forEach(function(b){ b.title = o.themeLight||''; });
+  document.querySelectorAll('.theme-seg [data-theme-pick="dark"]').forEach(function(b){ b.title = o.themeDark||''; });
+  document.querySelectorAll('[data-text-size-pick="sm"]').forEach(function(b){ b.textContent = o.sizeSm||''; });
+  document.querySelectorAll('[data-text-size-pick="md"]').forEach(function(b){ b.textContent = o.sizeMd||''; });
+  document.querySelectorAll('[data-text-size-pick="lg"]').forEach(function(b){ b.textContent = o.sizeLg||''; });
+  document.querySelectorAll('.lang-select-mobile').forEach(function(sel){
+    sel.setAttribute('aria-label', o.langLabel||'');
+  });
+}
+
 function setLang(lang, zone){
   if(!UI[lang]) lang = 'PT';
   APP.lang = lang;
   const T = UI[lang];
-  const sel = zone === 'login' ? '.lang-top .lp' : '.lang-app .lp';
-  document.querySelectorAll(sel).forEach(p => {
+  document.querySelectorAll('.lang-top .lp, .lang-app .lp').forEach(p => {
     p.classList.toggle('active', p.textContent.trim() === lang);
+  });
+  document.querySelectorAll('[data-lang-pick]').forEach(b => {
+    const on = b.getAttribute('data-lang-pick') === lang;
+    b.classList.toggle('on', on);
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
   const loginSel = document.getElementById('lang-login-sel');
   if(loginSel) loginSel.value = lang;
@@ -2021,6 +2019,7 @@ function setLang(lang, zone){
   s('lbl-tab-nova',T.tabNova); s('lbl-tab-historico',T.tabHistorico);
   s('bn-lbl-all',T.bnAll||'Reservas'); s('bn-lbl-upcoming',T.bnUpcoming||'Próximas');
   s('bn-lbl-nova',T.bnNova||'Nova'); s('bn-lbl-hist',T.bnHist||'Histórico');
+  applyDispI18n(T);
   s('lbl-upcoming-title',T.upcomingTitle); s('lbl-upcoming-sub',T.upcomingSub);
   s('lbl-btn-hist',T.btnHist);
   // Nova
@@ -2114,6 +2113,13 @@ function showReset(){
   document.getElementById('step-login').style.display = 'none';
   document.getElementById('step-reset1').style.display = 'block';
   document.getElementById('step-reset2').style.display = 'none';
+  ['login-err','r1-err','r2-err','r2-ok','r2-warn'].forEach(id => {
+    const e = document.getElementById(id);
+    if(e) e.classList.remove('show');
+  });
+  const fromLogin = document.getElementById('ag-id');
+  const r1 = document.getElementById('r1-id');
+  if(fromLogin && r1 && !r1.value && fromLogin.value) r1.value = fromLogin.value.trim();
 }
 
 function showStep2(){
@@ -2187,12 +2193,14 @@ async function doDemandarCodigo(){
       APP.resetId = id;
       msgBox('r2-warn', '📧 ' + (d.message || 'Código enviado para o email.'), 'warn');
       showStep2();
+      const c = document.getElementById('r2-code'); if(c){ c.value=''; c.focus(); }
+      const nw = document.getElementById('r2-new'); if(nw) nw.value='';
+      const cf = document.getElementById('r2-cf'); if(cf) cf.value='';
     } else {
       msgBox('r1-err', d.error || t().errConn, 'err');
     }
   } catch(e){
-    // Si l'action n'existe pas côté Apps Script, on informe l'utilisateur
-    msgBox('r1-err', 'Função não disponível. Contacte o administrador: sigagomesafonso@gmail.com', 'err');
+    msgBox('r1-err', t().errConn + (e && e.message ? ' — ' + e.message : ''), 'err');
   } finally {
     btn.classList.remove('loading'); btn.disabled = false;
   }
@@ -2207,6 +2215,7 @@ async function doConfirmarMDP(){
     if(e) e.classList.remove('show');
   });
   if(!code || !nw || !cf){ msgBox('r2-err', t().errEmpty, 'err'); return; }
+  if(code.replace(/\D/g,'').length !== 6){ msgBox('r2-err', t().r2Hint || 'O código tem 6 dígitos.', 'err'); return; }
   if(nw.length < 8){ msgBox('r2-err', t().errPwShort, 'err'); return; }
   if(nw !== cf){ msgBox('r2-err', t().errPwMatch, 'err'); return; }
   const btn = document.getElementById('r2-btn');
@@ -2214,13 +2223,15 @@ async function doConfirmarMDP(){
   try {
     const d = await api({ action:'confirmerChangementMDP', identifiant:APP.resetId, code, nouveauPass:nw });
     if(d.success){
-      msgBox('r2-ok', t().okPwChanged, 'ok');
-      setTimeout(() => showLogin(), 2500);
+      msgBox('r2-ok', d.message || t().okPwChanged, 'ok');
+      const login = document.getElementById('ag-id'); if(login) login.value = APP.resetId || '';
+      const pw = document.getElementById('ag-pass'); if(pw) pw.value = '';
+      setTimeout(() => showLogin(), 2200);
     } else {
       msgBox('r2-err', d.error || t().errConn, 'err');
     }
   } catch(e){
-    msgBox('r2-err', 'Função não disponível. Contacte o administrador.', 'err');
+    msgBox('r2-err', t().errConn + (e && e.message ? ' — ' + e.message : ''), 'err');
   } finally {
     btn.classList.remove('loading'); btn.disabled = false;
   }
@@ -4200,6 +4211,26 @@ document.addEventListener('keydown', e => {
   }
   bindAgencyTheme();
   setAgencyTheme((function(){try{return localStorage.getItem(KEY)==='dark'?'dark':'light';}catch(e){return'light';}})());
+  function closeDispMenu(){
+    document.querySelectorAll('.disp-menu-pop.open').forEach(function(p){p.classList.remove('open');});
+    document.querySelectorAll('.disp-more-btn').forEach(function(b){b.setAttribute('aria-expanded','false');});
+  }
+  window.closeDispMenu=closeDispMenu;
+  window.toggleDispMenu=function(ev){
+    if(ev) ev.stopPropagation();
+    var btn=ev&&ev.currentTarget;
+    var pop=btn&&btn.parentElement&&btn.parentElement.querySelector('.disp-menu-pop');
+    if(!pop) return;
+    var willOpen=!pop.classList.contains('open');
+    closeDispMenu();
+    if(willOpen){ pop.classList.add('open'); btn.setAttribute('aria-expanded','true'); }
+  };
+  document.addEventListener('click',function(e){
+    if(document.querySelector('.disp-menu-pop.open')&&!e.target.closest('.disp-menu-anchor'))closeDispMenu();
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'&&document.querySelector('.disp-menu-pop.open')){e.preventDefault();closeDispMenu();}
+  });
   var SIZE_KEY='nlp_agency_text_size';
   function setTextSize(mode){
     var sz=(mode==='md'||mode==='lg')?mode:'sm';
