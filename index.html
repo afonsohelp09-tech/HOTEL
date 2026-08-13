@@ -271,6 +271,7 @@ td.mono{font-family:monospace;font-size:12px;color:var(--navy3);font-weight:600}
 .b-real{background:var(--info-bg);color:var(--info);border:1px solid var(--info-b)}.b-real::before{background:var(--info)}
 .badge-new{background:linear-gradient(135deg,#7C3AED,#A855F7);color:#fff;font-size:9px;padding:2px 7px;border-radius:10px;margin-right:4px}
 .badge-soon{background:var(--up-bg);color:var(--upcoming);border:1px solid var(--up-b);font-size:9px;padding:2px 7px;border-radius:10px;margin-right:4px}
+.nl-badge{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:rgba(201,168,76,.18);color:#c9a84c;border:1px solid rgba(201,168,76,.5);border-radius:4px;padding:2px 7px;vertical-align:middle;white-space:nowrap;margin-left:4px}
 .row-acts{display:flex;gap:4px;align-items:center;justify-content:flex-end}
 .acts-inline{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
 .acts-dd{position:relative;display:none;vertical-align:middle}
@@ -1877,6 +1878,15 @@ function badge(st){
 function oIco(tp){
   return {airport:'✈️',hotel:'🏨',bus:'🚌',train:'🚂',highspeed:'🚄'}[tp] || '🚗';
 }
+function isResaNextLevel(r){
+  if(!r) return false;
+  const cree=String(r.criadoPor||r.creePar||r.canal||'').toUpperCase();
+  if(r.fromNextLevel||cree==='NEXT_LEVEL') return true;
+  return /^NL[-_]/i.test(String(r.id||''));
+}
+function nlBadgeHtml(){
+  return '<span class="nl-badge" title="Next Level">Next Level</span>';
+}
 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s => {
@@ -2589,8 +2599,10 @@ function renderTable(){
         actInner += `<button class="btn btn-danger btn-sm" onclick="quickCancel('${r.id}')" title="${T2.btnCancel}">❌</button>`;
     }
     const acts = wrapActsMenu_(actInner, T2.colActs || 'Ações');
+    const nl=isResaNextLevel(r);
+    const nlTag=nl?' '+nlBadgeHtml():'';
     html += `<tr>
-      <td class="mono">${r.id}</td>
+      <td class="mono">${r.id}${nlTag}</td>
       <td class="bold">
         ${isNew ? '<span class="badge-new">NEW</span>' : ''}
         ${isSoon ? '<span class="badge-soon">SOON</span>' : ''}
@@ -2608,7 +2620,7 @@ function renderTable(){
     </tr>`;
     cards += `<article class="m-card" onclick="openDetail('${r.id}')">
       <div class="m-card-top">
-        <span class="m-card-ref">${r.id}</span>
+        <span class="m-card-ref">${r.id}</span>${nlTag}
         ${badge(r.statut)}
       </div>
       <p class="m-card-client">${isNew?'<span class="badge-new">NEW</span> ':''}${isSoon?'<span class="badge-soon">SOON</span> ':''}${r.clientNom||'—'}</p>
@@ -2680,7 +2692,7 @@ function renderUpcoming(){
         <div><div class="tl-time">${(r.heureTransfer||'—').slice(0,5)}</div><div class="tl-time-lbl">h</div></div>
         <div class="tl-divider"></div>
         <div class="tl-body">
-          <div class="tl-ref">${r.id}</div>
+          <div class="tl-ref">${r.id}${isResaNextLevel(r)?' '+nlBadgeHtml():''}</div>
           <div class="tl-client">${r.clientNom||'—'}</div>
           <div class="tl-route">${oIco(r.origineType)} ${r.pointDepart||'—'} → ${r.destination||'—'}</div>
           <div class="tl-meta">
@@ -2725,7 +2737,7 @@ function renderModal(idx){
   const T2 = t();
   const total = APP.reservas.length;
 
-  document.getElementById('m-id').textContent = r.id;
+  document.getElementById('m-id').innerHTML = r.id + (isResaNextLevel(r) ? ' ' + nlBadgeHtml() : '');
   document.getElementById('modal-nav-pos').textContent = `${idx+1}/${total}`;
   document.getElementById('btn-nav-prev').disabled = idx <= 0;
   document.getElementById('btn-nav-next').disabled = idx >= total - 1;
@@ -2757,6 +2769,7 @@ function renderModal(idx){
   gridHtml += `<div class="info-item"><div class="info-label">${T2.lblStatus}</div><div class="info-value">${badge(r.statut)}</div></div>`;
   const payLbl = (r.statutPaiement === 'payé' || r.statutPaiement === 'pago') ? '💶 Pago' : (r.statutPaiement || 'non_payé');
   gridHtml += `<div class="info-item"><div class="info-label">${T2.lblPayment||'Pagamento'}</div><div class="info-value">${payLbl}</div></div>`;
+  if(isResaNextLevel(r)) gridHtml += `<div class="info-item"><div class="info-label">Origem</div><div class="info-value">${nlBadgeHtml()}</div></div>`;
   if(r.commentaires) gridHtml += `<div class="info-item full"><div class="info-label">${T2.lblComments}</div><div class="info-value">${r.commentaires}</div></div>`;
   document.getElementById('m-grid').innerHTML = gridHtml;
 
