@@ -314,21 +314,25 @@ html[data-theme="dark"] .acts-dd-menu{background:var(--surface);box-shadow:0 10p
 .timeline-day{margin-bottom:28px}
 .timeline-date{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--upcoming);margin-bottom:12px;display:flex;align-items:center;gap:10px}
 .timeline-date::after{content:'';flex:1;height:1px;background:var(--up-b)}
-.timeline-cards{display:flex;flex-direction:column;gap:10px}
-.tl-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;display:flex;gap:16px;align-items:flex-start;transition:var(--ease);cursor:pointer}
+.timeline-cards{display:flex;flex-direction:column;gap:12px}
+.tl-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px;display:flex;gap:14px;align-items:flex-start;transition:var(--ease);cursor:pointer;box-shadow:var(--shadow,0 1px 3px rgba(13,33,55,.06))}
 .tl-card:hover{border-color:var(--upcoming);box-shadow:0 0 0 3px rgba(124,58,237,.06);transform:translateY(-1px)}
 .tl-card.urgent{border-left:4px solid var(--danger)}
 .tl-card.today{border-left:4px solid var(--gold)}
-.tl-time{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--navy);min-width:54px;text-align:center;line-height:1}
-.tl-time-lbl{font-size:9px;color:var(--ts);text-align:center;margin-top:2px}
-.tl-divider{width:1px;background:var(--border2);align-self:stretch;margin:0 4px}
-.tl-body{flex:1;min-width:0}
-.tl-ref{font-family:monospace;font-size:11px;color:var(--navy3);font-weight:600}
-.tl-client{font-size:14px;font-weight:600;color:var(--text);margin:2px 0}
-.tl-route{font-size:12px;color:var(--ts);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tl-meta{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap}
-.tl-meta span{font-size:11px;color:var(--ts)}
-.tl-acts{display:flex;gap:6px;flex-direction:column;align-items:flex-end}
+.tl-time-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-width:58px;flex-shrink:0;padding-top:2px}
+.tl-time{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--navy);min-width:54px;text-align:center;line-height:1;letter-spacing:.02em}
+.tl-time-lbl{font-size:9px;color:var(--ts);text-align:center;margin-top:3px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.tl-divider{width:1px;background:var(--border2);align-self:stretch;margin:0 2px;flex-shrink:0}
+.tl-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.tl-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tl-ref{font-family:ui-monospace,monospace;font-size:12px;color:var(--navy3,#334155);font-weight:700}
+.tl-client{font-size:15px;font-weight:700;color:var(--text);margin:0;line-height:1.3;word-break:break-word}
+.tl-route{font-size:13px;color:var(--tm,#475569);font-weight:500;line-height:1.45;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tl-route-from,.tl-route-to{display:inline}
+.tl-meta{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center}
+.tl-meta span,.tl-chip{font-size:12px;font-weight:600;color:var(--tm,#475569);background:var(--surface,#f1f5f9);border:1px solid var(--border2,#e2e8f0);border-radius:999px;padding:4px 10px;line-height:1.3;max-width:100%;word-break:break-word}
+.tl-chip-tel{color:var(--navy)!important;background:rgba(13,33,55,.06)!important;border-color:rgba(13,33,55,.14)!important}
+.tl-acts{display:flex;gap:6px;flex-direction:column;align-items:flex-end;flex-shrink:0}
 
 /* ══ MODAL ══ */
 .overlay{position:fixed;inset:0;background:rgba(13,33,55,.65);backdrop-filter:blur(5px);z-index:900;display:none;align-items:center;justify-content:center;padding:20px}
@@ -500,6 +504,8 @@ html[data-theme="dark"] .tl-time{color:var(--text)}
 html[data-theme="dark"] .tl-time-lbl,
 html[data-theme="dark"] .tl-route,
 html[data-theme="dark"] .tl-meta span,
+html[data-theme="dark"] .tl-chip{color:#e2e8f0;background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}
+html[data-theme="dark"] .tl-chip-tel{color:#f8fafc!important;background:rgba(167,139,250,.18)!important;border-color:rgba(167,139,250,.35)!important}
 html[data-theme="dark"] .upcoming-sub{color:var(--ts)}
 html[data-theme="dark"] .empty-title{color:var(--text)}
 html[data-theme="dark"] .empty-sub,
@@ -737,11 +743,37 @@ html[data-theme="dark"] .header .lang-app .lp.active{
   .page-btns{justify-content:center;flex-wrap:wrap;gap:8px}
   .page-btn{min-width:44px;min-height:44px;padding:10px 14px;touch-action:manipulation}
   .info-grid{grid-template-columns:1fr}
-  .tl-card{flex-direction:column}
+  /* Próximas — cartes empilées lisibles */
+  #section-upcoming .upcoming-header,.upcoming-header{padding:14px 16px;align-items:flex-start}
+  #section-upcoming .upcoming-title,.upcoming-title{font-size:1.125rem;line-height:1.25}
+  #section-upcoming .upcoming-sub,.upcoming-sub{font-size:.8125rem;line-height:1.4}
+  .timeline{padding:14px 12px;padding-bottom:max(20px, env(safe-area-inset-bottom))}
+  .timeline-day{margin-bottom:20px}
+  .timeline-date{font-size:.75rem;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+  .timeline-cards{gap:12px}
+  .tl-card{
+    flex-direction:column;gap:10px;padding:14px;
+    align-items:stretch;min-height:0;touch-action:manipulation;
+  }
+  .tl-time-col{
+    flex-direction:row;align-items:center;justify-content:flex-start;
+    gap:8px;min-width:0;width:100%;padding:0;
+  }
+  .tl-time{font-size:1.375rem;min-width:0;text-align:left}
+  .tl-time-lbl{margin-top:0;font-size:.6875rem}
   .tl-divider{display:none}
-  .tl-acts{align-self:stretch;text-align:center}
-  .timeline{padding:16px 12px;padding-bottom:max(20px, env(safe-area-inset-bottom))}
-  .upcoming-header{padding:14px 16px}
+  .tl-head{width:100%}
+  .tl-client{font-size:1rem;font-weight:700}
+  .tl-route{
+    white-space:normal;overflow:visible;text-overflow:unset;
+    font-size:.875rem;line-height:1.45;color:var(--text);
+  }
+  .tl-route-block{display:flex;flex-direction:column;gap:2px}
+  .tl-route-from,.tl-route-to{display:block}
+  .tl-meta{gap:6px;margin-top:8px}
+  .tl-meta span,.tl-chip{font-size:.75rem;padding:5px 10px}
+  .tl-acts{align-self:stretch;flex-direction:row;justify-content:flex-start;align-items:center;flex-wrap:wrap;gap:8px;text-align:left}
+  .tl-acts .badge{font-size:.75rem;padding:5px 10px}
   .overlay{
     padding:0;
     align-items:flex-end;
@@ -2724,13 +2756,13 @@ function renderUpcoming(){
     wrap.innerHTML = `<div class="empty"><div class="empty-icon">🗓</div><div class="empty-title">${T2.upcomingEmpty}</div></div>`;
     return;
   }
-  // Grouper par jour
   const groups = {};
   upcoming.forEach(r => {
     const k = r.dateTransfer || '';
     if(!groups[k]) groups[k] = [];
     groups[k].push(r);
   });
+  const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
   let html = '';
   Object.keys(groups).sort().forEach(dateKey => {
     const d = parseDate(dateKey);
@@ -2743,22 +2775,32 @@ function renderUpcoming(){
     groups[dateKey].forEach(r => {
       const isToday = diffDays === 0;
       const isUrgent = diffDays <= 1 && r.statut === 'pendente';
-      html += `<div class="tl-card ${isUrgent?'urgent':isToday?'today':''}" onclick="openDetail('${r.id}')">
-        <div><div class="tl-time">${(r.heureTransfer||'—').slice(0,5)}</div><div class="tl-time-lbl">h</div></div>
+      const tel = String(r.clientTel||r.telefone||r.tel||'').trim();
+      const heure = (r.heureTransfer||'—').toString().slice(0,5);
+      const dep = esc(r.pointDepart||'—');
+      const dest = esc(r.destination||'—');
+      html += `<div class="tl-card ${isUrgent?'urgent':isToday?'today':''}" onclick="openDetail('${esc(r.id)}')">
+        <div class="tl-time-col"><div class="tl-time">${esc(heure)}</div><div class="tl-time-lbl">${isToday?(T2.today||'Hoje'):'h'}</div></div>
         <div class="tl-divider"></div>
         <div class="tl-body">
-          <div class="tl-ref">${r.id}${isResaNextLevel(r)?' '+nlBadgeHtml():''}</div>
-          <div class="tl-client">${r.clientNom||'—'}</div>
-          <div class="tl-route">${oIco(r.origineType)} ${r.pointDepart||'—'} → ${r.destination||'—'}</div>
+          <div class="tl-head">
+            <div class="tl-ref">${esc(r.id)}${isResaNextLevel(r)?' '+nlBadgeHtml():''}</div>
+            <div class="tl-acts">${badge(r.statut)}</div>
+          </div>
+          <div class="tl-client">${esc(r.clientNom||'—')}</div>
+          <div class="tl-route tl-route-block">
+            <span class="tl-route-from">${oIco(r.origineType)} ${dep}</span>
+            <span class="tl-route-to">→ ${dest}</span>
+          </div>
           <div class="tl-meta">
-            <span>👤 ${r.personnes||'—'}</span>
-            <span>🧳 ${r.malas||'0'}</span>
-            ${formatPaxDetailLine_(r) ? `<span style="opacity:.75">${formatPaxDetailLine_(r)}</span>` : ''}
-            ${r.numVol ? `<span>✈️ ${r.numVol}</span>` : ''}
-            <span>💶 ${r.prixFinal ? r.prixFinal+' €' : '—'}</span>
+            <span class="tl-chip">👤 ${esc(r.personnes||'—')}</span>
+            <span class="tl-chip">🧳 ${esc(r.malas||'0')}</span>
+            ${formatPaxDetailLine_(r) ? `<span class="tl-chip" style="opacity:.9">${esc(formatPaxDetailLine_(r))}</span>` : ''}
+            ${r.numVol ? `<span class="tl-chip">✈️ ${esc(r.numVol)}</span>` : ''}
+            ${tel ? `<span class="tl-chip tl-chip-tel">📞 ${esc(tel)}</span>` : ''}
+            <span class="tl-chip">💶 ${r.prixFinal ? esc(r.prixFinal)+' €' : '—'}</span>
           </div>
         </div>
-        <div class="tl-acts">${badge(r.statut)}</div>
       </div>`;
     });
     html += `</div></div>`;
